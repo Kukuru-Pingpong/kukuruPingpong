@@ -25,7 +25,8 @@ export default function CharacterSelectScreen({
   const cpuTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const isP2Turn = mode === 'local' && p1Character !== null;
-  const currentSelectingPlayer = mode === 'local' ? (isP2Turn ? 2 : 1) : (playerNum as 1 | 2);
+  const currentSelectingPlayer =
+    mode === 'local' ? (isP2Turn ? 2 : 1) : (playerNum as 1 | 2);
 
   // CPU 자동 캐릭터 선택
   useEffect(() => {
@@ -38,14 +39,16 @@ export default function CharacterSelectScreen({
 
       // 랜덤하게 캐릭터를 하이라이트하는 애니메이션
       cpuTimerRef.current = setInterval(() => {
-        const randomChar = available[Math.floor(Math.random() * available.length)];
+        const randomChar =
+          available[Math.floor(Math.random() * available.length)];
         setCpuHighlight(randomChar.id);
         tick++;
 
         if (tick >= totalTicks) {
           if (cpuTimerRef.current) clearInterval(cpuTimerRef.current);
           // 최종 선택
-          const finalChoice = available[Math.floor(Math.random() * available.length)];
+          const finalChoice =
+            available[Math.floor(Math.random() * available.length)];
           setCpuHighlight(finalChoice.id);
           setTimeout(() => {
             onSelect(finalChoice, 2);
@@ -78,21 +81,52 @@ export default function CharacterSelectScreen({
       {/* Retro Header */}
       <header className="retro-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '1.2rem' }}>🎮</span>
-          <span style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>KUKURU PINGPONG</span>
+          <span style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>
+            KUKURU PINGPONG
+          </span>
         </div>
         <div className="retro-badge">{nickname || 'PLAYER'}</div>
       </header>
 
-      <main className="screen" style={{ paddingTop: '80px', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
+      <main
+        className="screen"
+        style={{
+          paddingTop: '80px',
+          flexDirection: 'column',
+          gap: '20px',
+          alignItems: 'center',
+        }}
+      >
         {cpuSelecting ? (
           <>
-            <div className="retro-badge-light" style={{ margin: '0 auto', fontSize: '0.5rem', animation: 'gb-blink 1s step-end infinite' }}>
+            <div
+              className="retro-badge-light"
+              style={{
+                margin: '0 auto',
+                fontSize: '0.5rem',
+                animation: 'gb-blink 1s step-end infinite',
+              }}
+            >
               상대방이 선택하는 중입니다...
             </div>
 
-            <div className="retro-frame" style={{ width: '100%', maxWidth: '460px', margin: '0 auto', padding: '8px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gridTemplateRows: 'repeat(2, 1fr)', gap: '6px' }}>
+            <div
+              className="retro-frame"
+              style={{
+                width: '100%',
+                maxWidth: '460px',
+                margin: '0 auto',
+                padding: '8px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(4, 1fr)',
+                  gridTemplateRows: 'repeat(2, 1fr)',
+                  gap: '6px',
+                }}
+              >
                 {characters.map((char) => {
                   const isLocked = p1Character?.id === char.id;
                   const isHighlighted = cpuHighlight === char.id;
@@ -108,8 +142,12 @@ export default function CharacterSelectScreen({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        border: isHighlighted ? '4px solid var(--border)' : '2px solid var(--border)',
-                        boxShadow: isHighlighted ? '0 0 10px var(--border)' : 'none',
+                        border: isHighlighted
+                          ? '4px solid var(--border)'
+                          : '2px solid var(--border)',
+                        boxShadow: isHighlighted
+                          ? '0 0 10px var(--border)'
+                          : 'none',
                         overflow: 'hidden',
                         position: 'relative',
                         transition: 'all 0.15s ease',
@@ -118,10 +156,25 @@ export default function CharacterSelectScreen({
                       <img
                         src={char.image}
                         alt={char.name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'pixelated' }}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          imageRendering: 'pixelated',
+                        }}
                       />
                       {isLocked && (
-                        <div className="retro-badge" style={{ position: 'absolute', bottom: '2px', fontSize: '0.3rem', padding: '1px 2px' }}>P1</div>
+                        <div
+                          className="retro-badge"
+                          style={{
+                            position: 'absolute',
+                            bottom: '2px',
+                            fontSize: '0.3rem',
+                            padding: '1px 2px',
+                          }}
+                        >
+                          P1
+                        </div>
                       )}
                     </div>
                   );
@@ -135,10 +188,34 @@ export default function CharacterSelectScreen({
               PLAYER {currentSelectingPlayer} SELECTION
             </div>
 
-            <h1 style={{ fontSize: '1.2rem', textAlign: 'center', marginBottom: '8px', width: '100%' }}>CHOOSE YOUR FIGHTER</h1>
+            <h1
+              style={{
+                fontSize: '1.2rem',
+                textAlign: 'center',
+                marginBottom: '8px',
+                width: '100%',
+              }}
+            >
+              CHOOSE YOUR FIGHTER
+            </h1>
 
-            <div className="retro-frame" style={{ width: '100%', maxWidth: '460px', margin: '0 auto', padding: '8px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gridTemplateRows: 'repeat(2, 1fr)', gap: '6px' }}>
+            <div
+              className="retro-frame"
+              style={{
+                width: '100%',
+                maxWidth: '460px',
+                margin: '0 auto',
+                padding: '8px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(4, 1fr)',
+                  gridTemplateRows: 'repeat(2, 1fr)',
+                  gap: '6px',
+                }}
+              >
                 {characters.map((char) => {
                   const isLocked = isP2Turn && p1Character?.id === char.id;
                   const isSelected = selected?.id === char.id;
@@ -157,8 +234,12 @@ export default function CharacterSelectScreen({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        border: isSelected ? '4px solid var(--border)' : '2px solid var(--border)',
-                        boxShadow: isSelected ? '0 0 10px var(--border)' : 'none',
+                        border: isSelected
+                          ? '4px solid var(--border)'
+                          : '2px solid var(--border)',
+                        boxShadow: isSelected
+                          ? '0 0 10px var(--border)'
+                          : 'none',
                         overflow: 'hidden',
                         position: 'relative',
                       }}
@@ -166,10 +247,25 @@ export default function CharacterSelectScreen({
                       <img
                         src={char.image}
                         alt={char.name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'pixelated' }}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          imageRendering: 'pixelated',
+                        }}
                       />
                       {isLocked && (
-                        <div className="retro-badge" style={{ position: 'absolute', bottom: '2px', fontSize: '0.3rem', padding: '1px 2px' }}>P1</div>
+                        <div
+                          className="retro-badge"
+                          style={{
+                            position: 'absolute',
+                            bottom: '2px',
+                            fontSize: '0.3rem',
+                            padding: '1px 2px',
+                          }}
+                        >
+                          P1
+                        </div>
                       )}
                     </button>
                   );
@@ -189,7 +285,14 @@ export default function CharacterSelectScreen({
             </div>
 
             {mode === 'online' && !selected && (
-              <div className="retro-badge-light" style={{ margin: '0 auto', fontSize: '0.45rem', animation: 'gb-blink 1s step-end infinite' }}>
+              <div
+                className="retro-badge-light"
+                style={{
+                  margin: '0 auto',
+                  fontSize: '0.45rem',
+                  animation: 'gb-blink 1s step-end infinite',
+                }}
+              >
                 WAITING FOR OPPONENT...
               </div>
             )}

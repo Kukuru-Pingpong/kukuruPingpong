@@ -23,7 +23,14 @@ interface BattleScreenProps {
   lastWinner?: 1 | 2 | null;
 }
 
-type Phase = 'enter' | 'scores' | 'charge' | 'projectile' | 'hit' | 'hp' | 'done';
+type Phase =
+  | 'enter'
+  | 'scores'
+  | 'charge'
+  | 'projectile'
+  | 'hit'
+  | 'hp'
+  | 'done';
 
 export default function BattleScreen({
   p1Character,
@@ -90,7 +97,9 @@ export default function BattleScreen({
         playBlob(recordings[1], audio1Ref.current),
         playBlob(recordings[2], audio2Ref.current),
       ]);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
 
     setNowPlaying(0);
     setAutoPlayDone(true);
@@ -123,11 +132,8 @@ export default function BattleScreen({
     const loser = w === 1 ? 2 : 1;
     const s1 = judgment.player1_total ?? judgment.player1_score ?? 0;
     const s2 = judgment.player2_total ?? judgment.player2_score ?? 0;
-    
-    const dmg = calculateDamage(
-      w === 1 ? s1 : s2,
-      loser === 1 ? s1 : s2,
-    );
+
+    const dmg = calculateDamage(w === 1 ? s1 : s2, loser === 1 ? s1 : s2);
 
     setWinner(w);
     setDamage(dmg);
@@ -200,34 +206,104 @@ export default function BattleScreen({
       <div className="lobby-container">
         <header className="retro-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '1.2rem' }}>🎮</span>
-            <span style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>KUKURU PINGPONG</span>
+            <span style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>
+              KUKURU PINGPONG
+            </span>
           </div>
           <div className="retro-badge">{nickname || 'PLAYER'}</div>
         </header>
 
-        <main className="screen" style={{ paddingTop: '100px', flexDirection: 'column', gap: '24px', alignItems: 'center' }}>
+        <main
+          className="screen"
+          style={{
+            paddingTop: '100px',
+            flexDirection: 'column',
+            gap: '24px',
+            alignItems: 'center',
+          }}
+        >
           {sentence && (
-            <div className="retro-frame-dark" style={{ width: '100%', maxWidth: '460px', textAlign: 'center' }}>
-              <p style={{ fontSize: '0.8rem', lineHeight: '1.6' }}>"{sentence}"</p>
+            <div
+              className="retro-frame-dark"
+              style={{ width: '100%', maxWidth: '460px', textAlign: 'center' }}
+            >
+              <p style={{ fontSize: '0.8rem', lineHeight: '1.6' }}>
+                "{sentence}"
+              </p>
             </div>
           )}
 
-          <div style={{ display: 'flex', gap: '16px', width: '100%', maxWidth: '460px' }}>
-            <div className={`retro-frame${nowPlaying === 1 ? '-dark' : ''}`} style={{ flex: 1, textAlign: 'center' }}>
-              <img src={p1Character?.image} alt={p1Character?.name} style={{ width: '64px', height: '64px', objectFit: 'cover', imageRendering: 'pixelated' }} />
-              <div className="retro-badge" style={{ fontSize: '0.45rem', marginTop: '8px' }}>P1</div>
+          <div
+            style={{
+              display: 'flex',
+              gap: '16px',
+              width: '100%',
+              maxWidth: '460px',
+            }}
+          >
+            <div
+              className={`retro-frame${nowPlaying === 1 ? '-dark' : ''}`}
+              style={{ flex: 1, textAlign: 'center' }}
+            >
+              <img
+                src={p1Character?.image}
+                alt={p1Character?.name}
+                style={{
+                  width: '64px',
+                  height: '64px',
+                  objectFit: 'cover',
+                  imageRendering: 'pixelated',
+                }}
+              />
+              <div
+                className="retro-badge"
+                style={{ fontSize: '0.45rem', marginTop: '8px' }}
+              >
+                P1
+              </div>
               <audio ref={audio1Ref} />
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', fontSize: '1.5rem', fontWeight: 'bold' }}>VS</div>
-            <div className={`retro-frame${nowPlaying === 1 ? '-dark' : ''}`} style={{ flex: 1, textAlign: 'center' }}>
-              <img src={p2Character?.image} alt={p2Character?.name} style={{ width: '64px', height: '64px', objectFit: 'cover', imageRendering: 'pixelated' }} />
-              <div className="retro-badge" style={{ fontSize: '0.45rem', marginTop: '8px' }}>P2</div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+              }}
+            >
+              VS
+            </div>
+            <div
+              className={`retro-frame${nowPlaying === 1 ? '-dark' : ''}`}
+              style={{ flex: 1, textAlign: 'center' }}
+            >
+              <img
+                src={p2Character?.image}
+                alt={p2Character?.name}
+                style={{
+                  width: '64px',
+                  height: '64px',
+                  objectFit: 'cover',
+                  imageRendering: 'pixelated',
+                }}
+              />
+              <div
+                className="retro-badge"
+                style={{ fontSize: '0.45rem', marginTop: '8px' }}
+              >
+                P2
+              </div>
               <audio ref={audio2Ref} />
             </div>
           </div>
 
-          <div className="retro-badge-light" style={{ margin: '0 auto', animation: 'gb-blink 1s step-end infinite' }}>
+          <div
+            className="retro-badge-light"
+            style={{
+              margin: '0 auto',
+              animation: 'gb-blink 1s step-end infinite',
+            }}
+          >
             AI JUDGING VOICES...
           </div>
         </main>
@@ -239,13 +315,22 @@ export default function BattleScreen({
     <div className="lobby-container">
       <header className="retro-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '1.2rem' }}>🎮</span>
-          <span style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>KUKURU PINGPONG</span>
+          <span style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>
+            KUKURU PINGPONG
+          </span>
         </div>
         <div className="retro-badge">{nickname || 'PLAYER'}</div>
       </header>
 
-      <main className="screen" style={{ paddingTop: '100px', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
+      <main
+        className="screen"
+        style={{
+          paddingTop: '100px',
+          flexDirection: 'column',
+          gap: '20px',
+          alignItems: 'center',
+        }}
+      >
         <BattleHud
           p1Character={p1Character}
           p2Character={p2Character}
@@ -266,73 +351,127 @@ export default function BattleScreen({
         >
           {/* Hit flash overlay */}
           {phase === 'hit' && (
-            <div style={{
-              position: 'absolute',
-              inset: 0,
-              background: '#fff',
-              zIndex: 10,
-              animation: 'hitFlash 0.4s forwards',
-              pointerEvents: 'none',
-            }} />
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: '#fff',
+                zIndex: 10,
+                animation: 'hitFlash 0.4s forwards',
+                pointerEvents: 'none',
+              }}
+            />
           )}
 
           {/* Battle Characters */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            width: '100%',
-            marginTop: '40px'
-          }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              width: '100%',
+              marginTop: '40px',
+            }}
+          >
             {/* P1 */}
-            <div style={{
-              textAlign: 'center',
-              position: 'relative',
-              transform: phase === 'charge' && winner === 1 ? 'scale(1.2)' : 'none',
-              transition: 'all 0.2s',
-              animation: phase === 'hit' && loser === 1 ? 'hitRecoilLeft 0.4s ease-out' : 'none',
-              opacity: phase === 'hit' && loser === 1 ? 0.5 : 1,
-            }}>
-              <img src={p1Character?.image} alt={p1Character?.name} style={{ width: '80px', height: '80px', objectFit: 'cover', imageRendering: 'pixelated', filter: phase === 'charge' && winner === 1 ? 'drop-shadow(0 0 10px var(--border))' : 'none' }} />
+            <div
+              style={{
+                textAlign: 'center',
+                position: 'relative',
+                transform:
+                  phase === 'charge' && winner === 1 ? 'scale(1.2)' : 'none',
+                transition: 'all 0.2s',
+                animation:
+                  phase === 'hit' && loser === 1
+                    ? 'hitRecoilLeft 0.4s ease-out'
+                    : 'none',
+                opacity: phase === 'hit' && loser === 1 ? 0.5 : 1,
+              }}
+            >
+              <img
+                src={p1Character?.image}
+                alt={p1Character?.name}
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  objectFit: 'cover',
+                  imageRendering: 'pixelated',
+                  filter:
+                    phase === 'charge' && winner === 1
+                      ? 'drop-shadow(0 0 10px var(--border))'
+                      : 'none',
+                }}
+              />
               {(phase === 'hit' || phase === 'hp') && loser === 1 && (
-                <div style={{
-                  position: 'absolute',
-                  top: '-40px',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  fontSize: '1.5rem',
-                  color: '#ff0000',
-                  fontFamily: 'var(--font-pixel)',
-                  animation: 'damageFloat 1s forwards',
-                  zIndex: 20,
-                }}>-{damage}</div>
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '-40px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    fontSize: '1.5rem',
+                    color: '#ff0000',
+                    fontFamily: 'var(--font-pixel)',
+                    animation: 'damageFloat 1s forwards',
+                    zIndex: 20,
+                  }}
+                >
+                  -{damage}
+                </div>
               )}
             </div>
 
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', opacity: 0.3 }}>VS</div>
+            <div
+              style={{ fontSize: '1.5rem', fontWeight: 'bold', opacity: 0.3 }}
+            >
+              VS
+            </div>
 
             {/* P2 */}
-            <div style={{
-              textAlign: 'center',
-              position: 'relative',
-              transform: phase === 'charge' && winner === 2 ? 'scale(1.2)' : 'none',
-              transition: 'all 0.2s',
-              animation: phase === 'hit' && loser === 2 ? 'hitRecoil 0.4s ease-out' : 'none',
-              opacity: phase === 'hit' && loser === 2 ? 0.5 : 1,
-            }}>
-              <img src={p2Character?.image} alt={p2Character?.name} style={{ width: '80px', height: '80px', objectFit: 'cover', imageRendering: 'pixelated', filter: phase === 'charge' && winner === 2 ? 'drop-shadow(0 0 10px var(--border))' : 'none' }} />
+            <div
+              style={{
+                textAlign: 'center',
+                position: 'relative',
+                transform:
+                  phase === 'charge' && winner === 2 ? 'scale(1.2)' : 'none',
+                transition: 'all 0.2s',
+                animation:
+                  phase === 'hit' && loser === 2
+                    ? 'hitRecoil 0.4s ease-out'
+                    : 'none',
+                opacity: phase === 'hit' && loser === 2 ? 0.5 : 1,
+              }}
+            >
+              <img
+                src={p2Character?.image}
+                alt={p2Character?.name}
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  objectFit: 'cover',
+                  imageRendering: 'pixelated',
+                  filter:
+                    phase === 'charge' && winner === 2
+                      ? 'drop-shadow(0 0 10px var(--border))'
+                      : 'none',
+                }}
+              />
               {(phase === 'hit' || phase === 'hp') && loser === 2 && (
-                <div style={{
-                  position: 'absolute',
-                  top: '-40px',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  fontSize: '1.5rem',
-                  color: '#ff0000',
-                  fontFamily: 'var(--font-pixel)',
-                  animation: 'damageFloat 1s forwards',
-                  zIndex: 20,
-                }}>-{damage}</div>
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '-40px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    fontSize: '1.5rem',
+                    color: '#ff0000',
+                    fontFamily: 'var(--font-pixel)',
+                    animation: 'damageFloat 1s forwards',
+                    zIndex: 20,
+                  }}
+                >
+                  -{damage}
+                </div>
               )}
             </div>
           </div>
@@ -341,34 +480,39 @@ export default function BattleScreen({
           {phase === 'hit' && winner && (
             <>
               {/* Center burst */}
-              <div style={{
-                position: 'absolute',
-                top: '40%',
-                left: loser === 1 ? '15%' : '85%',
-                width: '60px',
-                height: '60px',
-                background: 'radial-gradient(circle, #fff 0%, #ffaa00 40%, transparent 70%)',
-                borderRadius: '50%',
-                animation: 'impactBurst 0.4s ease-out forwards',
-                zIndex: 15,
-                pointerEvents: 'none',
-              }} />
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '40%',
+                  left: loser === 1 ? '15%' : '85%',
+                  width: '60px',
+                  height: '60px',
+                  background:
+                    'radial-gradient(circle, #fff 0%, #ffaa00 40%, transparent 70%)',
+                  borderRadius: '50%',
+                  animation: 'impactBurst 0.4s ease-out forwards',
+                  zIndex: 15,
+                  pointerEvents: 'none',
+                }}
+              />
               {/* Shockwave ring */}
-              <div style={{
-                position: 'absolute',
-                top: '40%',
-                left: loser === 1 ? '15%' : '85%',
-                width: '40px',
-                height: '40px',
-                border: '4px solid #ffaa00',
-                borderRadius: '50%',
-                animation: 'impactRing 0.5s ease-out forwards',
-                zIndex: 15,
-                pointerEvents: 'none',
-              }} />
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '40%',
+                  left: loser === 1 ? '15%' : '85%',
+                  width: '40px',
+                  height: '40px',
+                  border: '4px solid #ffaa00',
+                  borderRadius: '50%',
+                  animation: 'impactRing 0.5s ease-out forwards',
+                  zIndex: 15,
+                  pointerEvents: 'none',
+                }}
+              />
               {/* Sparks */}
               {[0, 1, 2, 3, 4, 5].map((i) => {
-                const angle = (i * 60) * (Math.PI / 180);
+                const angle = i * 60 * (Math.PI / 180);
                 const dist = 40 + Math.random() * 20;
                 const tx = Math.cos(angle) * dist;
                 const ty = Math.sin(angle) * dist;
@@ -397,32 +541,43 @@ export default function BattleScreen({
 
           {/* Projectile */}
           {phase === 'projectile' && winner && (
-            <div style={{
-              position: 'absolute',
-              top: '50%',
-              left: winner === 1 ? '20%' : '80%',
-              fontSize: '2rem',
-              animation: winner === 1 ? 'projectileFlyRight 0.5s forwards' : 'projectileFlyLeft 0.5s forwards'
-            }}>
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: winner === 1 ? '20%' : '80%',
+                fontSize: '2rem',
+                animation:
+                  winner === 1
+                    ? 'projectileFlyRight 0.5s forwards'
+                    : 'projectileFlyLeft 0.5s forwards',
+              }}
+            >
               ✨
             </div>
           )}
 
           {/* Scores */}
           {phase !== 'enter' && (
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-around', 
-              width: '100%', 
-              marginTop: '40px',
-              fontFamily: 'var(--font-pixel)'
-            }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-around',
+                width: '100%',
+                marginTop: '40px',
+                fontFamily: 'var(--font-pixel)',
+              }}
+            >
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '0.5rem', marginBottom: '4px' }}>P1 SCORE</div>
+                <div style={{ fontSize: '0.5rem', marginBottom: '4px' }}>
+                  P1 SCORE
+                </div>
                 <div style={{ fontSize: '1.5rem' }}>{displayP1Score}</div>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '0.5rem', marginBottom: '4px' }}>P2 SCORE</div>
+                <div style={{ fontSize: '0.5rem', marginBottom: '4px' }}>
+                  P2 SCORE
+                </div>
                 <div style={{ fontSize: '1.5rem' }}>{displayP2Score}</div>
               </div>
             </div>
@@ -430,27 +585,35 @@ export default function BattleScreen({
 
           {/* Attack Line */}
           {phase === 'charge' && winner && (
-            <div className="retro-frame" style={{ 
-              position: 'absolute', 
-              bottom: '0', 
-              left: '50%', 
-              transform: 'translateX(-50%)',
-              width: '100%',
-              fontSize: '0.6rem',
-              textAlign: 'center'
-            }}>
-              &quot;{winner === 1 ? p1Character?.attackLine : p2Character?.attackLine}&quot;
+            <div
+              className="retro-frame"
+              style={{
+                position: 'absolute',
+                bottom: '0',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '100%',
+                fontSize: '0.6rem',
+                textAlign: 'center',
+              }}
+            >
+              &quot;
+              {winner === 1 ? p1Character?.attackLine : p2Character?.attackLine}
+              &quot;
             </div>
           )}
 
           {phase === 'done' && (
-            <div className="retro-badge-light" style={{ 
-              position: 'absolute', 
-              bottom: '0', 
-              left: '50%', 
-              transform: 'translateX(-50%)',
-              padding: '8px 16px'
-            }}>
+            <div
+              className="retro-badge-light"
+              style={{
+                position: 'absolute',
+                bottom: '0',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                padding: '8px 16px',
+              }}
+            >
               ROUND COMPLETE!
             </div>
           )}

@@ -4,7 +4,12 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { quotes } from '@/entities/quote';
 import { type Character } from '@/entities/character';
 import { BattleHud } from '@/widgets/battle-hud';
-import { startRecording, stopRecording, getStream, initAudio } from '@/shared/audio';
+import {
+  startRecording,
+  stopRecording,
+  getStream,
+  initAudio,
+} from '@/shared/audio';
 import { AudioVisualizer } from '@/widgets/audio-visualizer';
 
 interface WordSelectScreenProps {
@@ -13,7 +18,10 @@ interface WordSelectScreenProps {
   sentence?: string;
   loading?: string;
   onQuoteReady?: (quote: { text: string; source: string }) => void;
-  onRecordingComplete: (blob: Blob, quote: { text: string; source: string }) => void;
+  onRecordingComplete: (
+    blob: Blob,
+    quote: { text: string; source: string },
+  ) => void;
   p1Character?: Character | null;
   p2Character?: Character | null;
   p1Hp?: number;
@@ -51,7 +59,7 @@ export default function WordSelectScreen({
 
   // Determine the displayed quote text
   const isOnlineP2 = mode === 'online' && playerNum === 2;
-  const displayText = isOnlineP2 ? (externalSentence || '') : quote.text;
+  const displayText = isOnlineP2 ? externalSentence || '' : quote.text;
   const displaySource = isOnlineP2 ? '' : quote.source;
 
   // Request mic permission early
@@ -77,7 +85,15 @@ export default function WordSelectScreen({
       const t = setTimeout(() => setPhase('ready'), 500);
       return () => clearTimeout(t);
     }
-  }, [phase, isOnlineP2, externalSentence, mode, playerNum, quote, onQuoteReady]);
+  }, [
+    phase,
+    isOnlineP2,
+    externalSentence,
+    mode,
+    playerNum,
+    quote,
+    onQuoteReady,
+  ]);
 
   // Phase: ready → countdown (after 1s showing the quote)
   useEffect(() => {
@@ -142,13 +158,22 @@ export default function WordSelectScreen({
     <div className="lobby-container">
       <header className="retro-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '1.2rem' }}>🎮</span>
-          <span style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>KUKURU PINGPONG</span>
+          <span style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>
+            KUKURU PINGPONG
+          </span>
         </div>
         <div className="retro-badge">{nickname || 'PLAYER'}</div>
       </header>
 
-      <main className="screen" style={{ paddingTop: '80px', flexDirection: 'column', gap: '16px', alignItems: 'center' }}>
+      <main
+        className="screen"
+        style={{
+          paddingTop: '80px',
+          flexDirection: 'column',
+          gap: '16px',
+          alignItems: 'center',
+        }}
+      >
         <BattleHud
           p1Character={p1Character ?? null}
           p2Character={p2Character ?? null}
@@ -176,7 +201,10 @@ export default function WordSelectScreen({
           }}
         >
           {displaySource && (
-            <div className="retro-badge-light" style={{ fontSize: '0.4rem', margin: '0 auto' }}>
+            <div
+              className="retro-badge-light"
+              style={{ fontSize: '0.4rem', margin: '0 auto' }}
+            >
               {displaySource}
             </div>
           )}
@@ -188,7 +216,13 @@ export default function WordSelectScreen({
               justifyContent: 'center',
             }}
           >
-            <p style={{ fontSize: '0.9rem', lineHeight: '1.8', wordBreak: 'keep-all' }}>
+            <p
+              style={{
+                fontSize: '0.9rem',
+                lineHeight: '1.8',
+                wordBreak: 'keep-all',
+              }}
+            >
               {displayText ? `"${displayText}"` : '명대사를 기다리는 중...'}
             </p>
           </div>
@@ -196,14 +230,26 @@ export default function WordSelectScreen({
 
         {/* Phase: Waiting for sentence (online P2) */}
         {phase === 'waiting' && isOnlineP2 && !externalSentence && (
-          <div style={{ textAlign: 'center', fontSize: '0.6rem', color: 'var(--text-secondary)' }}>
+          <div
+            style={{
+              textAlign: 'center',
+              fontSize: '0.6rem',
+              color: 'var(--text-secondary)',
+            }}
+          >
             상대방이 명대사를 선택하는 중...
           </div>
         )}
 
         {/* Phase: Ready - show the quote */}
         {(phase === 'waiting' || phase === 'ready') && displayText && (
-          <div style={{ textAlign: 'center', fontSize: '0.6rem', color: 'var(--text-secondary)' }}>
+          <div
+            style={{
+              textAlign: 'center',
+              fontSize: '0.6rem',
+              color: 'var(--text-secondary)',
+            }}
+          >
             이 명대사를 읽어주세요!
           </div>
         )}
@@ -220,7 +266,13 @@ export default function WordSelectScreen({
             >
               {countdown}
             </div>
-            <div style={{ fontSize: '0.5rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
+            <div
+              style={{
+                fontSize: '0.5rem',
+                color: 'var(--text-secondary)',
+                marginTop: '8px',
+              }}
+            >
               곧 녹음이 시작됩니다...
             </div>
           </div>
@@ -263,7 +315,14 @@ export default function WordSelectScreen({
               </span>
             </div>
 
-            <div style={{ width: '100%', maxWidth: '300px', margin: '0 auto', height: '60px' }}>
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '300px',
+                margin: '0 auto',
+                height: '60px',
+              }}
+            >
               <AudioVisualizer stream={stream} isActive={true} />
             </div>
 
@@ -284,7 +343,10 @@ export default function WordSelectScreen({
         {/* Phase: Done */}
         {phase === 'done' && (
           <div style={{ textAlign: 'center' }}>
-            <div className="retro-badge" style={{ fontSize: '0.6rem', margin: '0 auto' }}>
+            <div
+              className="retro-badge"
+              style={{ fontSize: '0.6rem', margin: '0 auto' }}
+            >
               RECORDING COMPLETE!
             </div>
             <div
