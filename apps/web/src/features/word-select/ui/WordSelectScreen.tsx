@@ -1,16 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { quotes } from '@/entities/quote';
 import { type Character } from '@/entities/character';
 import { BattleHud } from '@/widgets/battle-hud';
+import { startRecording, stopRecording, getStream, initAudio } from '@/shared/audio';
+import { AudioVisualizer } from '@/widgets/audio-visualizer';
 
 interface WordSelectScreenProps {
   mode: 'local' | 'online';
   playerNum?: number;
-  opponentReady?: boolean;
-  onSubmitLocal: (word: string, quote: { text: string; source: string }) => void;
-  onSubmitOnline?: (word: string) => void;
+  sentence?: string;
+  loading?: string;
+  onQuoteReady?: (quote: { text: string; source: string }) => void;
+  onRecordingComplete: (blob: Blob, quote: { text: string; source: string }) => void;
   p1Character?: Character | null;
   p2Character?: Character | null;
   p1Hp?: number;
@@ -19,12 +22,15 @@ interface WordSelectScreenProps {
   nickname: string;
 }
 
+type Phase = 'waiting' | 'ready' | 'countdown' | 'recording' | 'done';
+
 export default function WordSelectScreen({
   mode,
   playerNum,
-  opponentReady,
-  onSubmitLocal,
-  onSubmitOnline,
+  sentence: externalSentence,
+  loading,
+  onQuoteReady,
+  onRecordingComplete,
   p1Character,
   p2Character,
   p1Hp = 3,
@@ -32,51 +38,108 @@ export default function WordSelectScreen({
   round = 1,
   nickname,
 }: WordSelectScreenProps) {
-  const [step, setStep] = useState<1 | 2>(1);
-  const [keyword1, setKeyword1] = useState<string | null>(null);
-  const [keyword2, setKeyword2] = useState<string | null>(null);
-  const [submitted, setSubmitted] = useState(false);
+  const [phase, setPhase] = useState<Phase>('waiting');
+  const [countdown, setCountdown] = useState(3);
+  const [timer, setTimer] = useState('00:00');
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const completedRef = useRef(false);
+  const recordingStartedRef = useRef(false);
 
-  const [quote1] = useState(() => {
+  const [quote] = useState(() => {
     return quotes[Math.floor(Math.random() * quotes.length)];
   });
 
-  const [quote2] = useState(() => {
-    const others = quotes.filter((q) => q.source !== quote1.source);
-    return others[Math.floor(Math.random() * others.length)];
-  });
+  // Determine the displayed quote text
+  const isOnlineP2 = mode === 'online' && playerNum === 2;
+  const displayText = isOnlineP2 ? (externalSentence || '') : quote.text;
+  const displaySource = isOnlineP2 ? '' : quote.source;
 
-  const [onlineQuote] = useState(() => {
-    return quotes[Math.floor(Math.random() * quotes.length)];
-  });
-  const [onlinePick, setOnlinePick] = useState<string | null>(null);
+  // Request mic permission early
+  useEffect(() => {
+    initAudio().catch(() => {});
+  }, []);
 
-  const handleNext = () => {
-    if (!keyword1) return;
-    setStep(2);
-  };
+  // Phase: waiting → ready (after brief delay)
+  useEffect(() => {
+    if (phase !== 'waiting') return;
 
-  const handleSubmit = () => {
-    if (mode === 'local') {
-      if (!keyword1 || !keyword2) return;
-      const useFirst = Math.random() < 0.5;
-      const selectedQuote = useFirst ? quote1 : quote2;
-      const selectedKeyword = useFirst ? keyword1 : keyword2;
-      onSubmitLocal(selectedKeyword, { text: selectedQuote.text, source: selectedQuote.source });
-      setSubmitted(true);
-    } else {
-      if (!onlinePick) {
-        alert('키워드를 선택해주세요!');
-        return;
+    if (isOnlineP2) {
+      // P2 waits for sentence from socket
+      if (externalSentence) {
+        const t = setTimeout(() => setPhase('ready'), 500);
+        return () => clearTimeout(t);
       }
-      onSubmitOnline?.(onlinePick);
-      setSubmitted(true);
+    } else {
+      // Local or Online P1: emit quote and start
+      if (mode === 'online' && playerNum === 1) {
+        onQuoteReady?.({ text: quote.text, source: quote.source });
+      }
+      const t = setTimeout(() => setPhase('ready'), 500);
+      return () => clearTimeout(t);
     }
-  };
+  }, [phase, isOnlineP2, externalSentence, mode, playerNum, quote, onQuoteReady]);
+
+  // Phase: ready → countdown (after 1s showing the quote)
+  useEffect(() => {
+    if (phase !== 'ready') return;
+    const t = setTimeout(() => setPhase('countdown'), 2000);
+    return () => clearTimeout(t);
+  }, [phase]);
+
+  // Phase: countdown 3...2...1
+  useEffect(() => {
+    if (phase !== 'countdown') return;
+    if (countdown <= 0) {
+      setPhase('recording');
+      return;
+    }
+    const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [phase, countdown]);
+
+  // Phase: auto-start recording
+  useEffect(() => {
+    if (phase !== 'recording') return;
+    if (recordingStartedRef.current) return;
+    recordingStartedRef.current = true;
+
+    let stopped = false;
+
+    const doRecord = async () => {
+      try {
+        await startRecording((time) => {
+          setTimer(time);
+        });
+        setStream(getStream());
+
+        // Auto-stop after 5 seconds
+        setTimeout(async () => {
+          if (stopped) return;
+          stopped = true;
+          const blob = await stopRecording();
+          if (blob && !completedRef.current) {
+            completedRef.current = true;
+            setPhase('done');
+            const q = isOnlineP2
+              ? { text: externalSentence || '', source: '' }
+              : { text: quote.text, source: quote.source };
+            onRecordingComplete(blob, q);
+          }
+        }, 5000);
+      } catch (err: any) {
+        alert('마이크 접근이 필요합니다: ' + err.message);
+      }
+    };
+
+    doRecord();
+
+    return () => {
+      stopped = true;
+    };
+  }, [phase, quote, externalSentence, isOnlineP2, onRecordingComplete]);
 
   return (
     <div className="lobby-container">
-      {/* Retro Header */}
       <header className="retro-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '1.2rem' }}>🎮</span>
@@ -85,7 +148,7 @@ export default function WordSelectScreen({
         <div className="retro-badge">{nickname || 'PLAYER'}</div>
       </header>
 
-      <main className="screen" style={{ paddingTop: '80px', flexDirection: 'column', gap: '12px' }}>
+      <main className="screen" style={{ paddingTop: '80px', flexDirection: 'column', gap: '16px' }}>
         <BattleHud
           p1Character={p1Character ?? null}
           p2Character={p2Character ?? null}
@@ -95,80 +158,146 @@ export default function WordSelectScreen({
         />
 
         <div className="retro-badge-light" style={{ margin: '0 auto' }}>
-          KEYWORD SELECTION
+          VOICE BATTLE
         </div>
 
-        <h1 style={{ fontSize: '1rem', textAlign: 'center', marginBottom: '8px' }}>
-          {mode === 'local' 
-            ? `PLAYER ${step} TURN` 
-            : `PICK YOUR CLUE`
-          }
-        </h1>
-
-        <div className="retro-frame" style={{ width: '100%', maxWidth: '460px', margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ fontSize: '0.5rem', marginBottom: '16px', color: 'var(--text-secondary)' }}>
-            CHOOSE A KEYWORD FROM THE WORK.
-          </p>
-          
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
-            {((mode === 'local' ? (step === 1 ? quote1 : quote2) : onlineQuote).keywords).map((w) => {
-              const isSelected = mode === 'local' ? (step === 1 ? keyword1 === w : keyword2 === w) : onlinePick === w;
-              return (
-                <button
-                  key={w}
-                  className={`retro-badge${isSelected ? '' : '-light'}`}
-                  onClick={() => {
-                    if (submitted) return;
-                    if (mode === 'local') {
-                      if (step === 1) setKeyword1(w);
-                      else setKeyword2(w);
-                    } else {
-                      setOnlinePick(w);
-                    }
-                  }}
-                  style={{ 
-                    padding: '8px 12px', 
-                    fontSize: '0.6rem',
-                    cursor: submitted ? 'not-allowed' : 'pointer',
-                    border: isSelected ? '2px solid var(--border)' : '1px solid var(--border)',
-                    boxShadow: isSelected ? '0 0 8px rgba(0,0,0,0.2)' : 'none'
-                  }}
-                >
-                  {w}
-                </button>
-              );
-            })}
+        {/* Quote Display */}
+        <div
+          className="retro-frame-dark"
+          style={{
+            width: '100%',
+            maxWidth: '460px',
+            margin: '0 auto',
+            minHeight: '120px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            textAlign: 'center',
+          }}
+        >
+          {displaySource && (
+            <div className="retro-badge-light" style={{ fontSize: '0.4rem', margin: '0 auto' }}>
+              {displaySource}
+            </div>
+          )}
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <p style={{ fontSize: '0.9rem', lineHeight: '1.8', wordBreak: 'keep-all' }}>
+              {displayText ? `"${displayText}"` : '명대사를 기다리는 중...'}
+            </p>
           </div>
         </div>
 
-        <div style={{ width: '100%', maxWidth: '460px', margin: '0 auto', marginTop: '12px' }}>
-          {mode === 'local' ? (
-            <button
-              className="retro-button"
-              onClick={step === 1 ? handleNext : handleSubmit}
-              disabled={step === 1 ? !keyword1 : !keyword2 || submitted}
-              style={{ width: '100%' }}
+        {/* Phase: Waiting for sentence (online P2) */}
+        {phase === 'waiting' && isOnlineP2 && !externalSentence && (
+          <div style={{ textAlign: 'center', fontSize: '0.6rem', color: 'var(--text-secondary)' }}>
+            상대방이 명대사를 선택하는 중...
+          </div>
+        )}
+
+        {/* Phase: Ready - show the quote */}
+        {(phase === 'waiting' || phase === 'ready') && displayText && (
+          <div style={{ textAlign: 'center', fontSize: '0.6rem', color: 'var(--text-secondary)' }}>
+            이 명대사를 읽어주세요!
+          </div>
+        )}
+
+        {/* Phase: Countdown */}
+        {phase === 'countdown' && (
+          <div style={{ textAlign: 'center' }}>
+            <div
+              style={{
+                fontSize: '3rem',
+                fontWeight: 'bold',
+                animation: 'gb-blink 0.5s step-end infinite',
+              }}
             >
-              {step === 1 ? '> NEXT PLAYER' : (submitted ? 'MIXING...' : '> START BATTLE')}
-            </button>
-          ) : (
-            <>
-              <button
-                className="retro-button"
-                onClick={handleSubmit}
-                disabled={submitted || !onlinePick}
-                style={{ width: '100%' }}
+              {countdown}
+            </div>
+            <div style={{ fontSize: '0.5rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
+              곧 녹음이 시작됩니다...
+            </div>
+          </div>
+        )}
+
+        {/* Phase: Recording */}
+        {phase === 'recording' && (
+          <>
+            <div
+              className="retro-frame"
+              style={{
+                margin: '0 auto',
+                padding: '8px 16px',
+                textAlign: 'center',
+                position: 'relative',
+              }}
+            >
+              <div
+                className="retro-badge"
+                style={{
+                  fontSize: '0.4rem',
+                  background: '#ff0000',
+                  color: '#fff',
+                  position: 'absolute',
+                  top: '-8px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                }}
               >
-                {submitted ? 'WAITING...' : '> START BATTLE'}
-              </button>
-              {submitted && (
-                <div style={{ textAlign: 'center', fontSize: '0.45rem', marginTop: '12px', color: 'var(--text-secondary)' }}>
-                  {opponentReady ? 'OPPONENT READY!' : 'WAITING FOR OPPONENT...'}
-                </div>
-              )}
-            </>
-          )}
-        </div>
+                REC
+              </div>
+              <span
+                style={{
+                  fontSize: '1.2rem',
+                  fontFamily: 'var(--font-pixel)',
+                  letterSpacing: '2px',
+                }}
+              >
+                {timer}
+              </span>
+            </div>
+
+            <div style={{ width: '100%', maxWidth: '300px', margin: '0 auto', height: '60px' }}>
+              <AudioVisualizer stream={stream} isActive={true} />
+            </div>
+
+            <div
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                background: '#ff0000',
+                margin: '0 auto',
+                animation: 'gb-blink 0.5s step-end infinite',
+                boxShadow: '0 0 20px #ff0000',
+              }}
+            />
+          </>
+        )}
+
+        {/* Phase: Done */}
+        {phase === 'done' && (
+          <div style={{ textAlign: 'center' }}>
+            <div className="retro-badge" style={{ fontSize: '0.6rem', margin: '0 auto' }}>
+              RECORDING COMPLETE!
+            </div>
+            <div
+              style={{
+                fontSize: '0.45rem',
+                color: 'var(--text-secondary)',
+                marginTop: '8px',
+              }}
+            >
+              {loading || 'AI가 분석 중...'}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

@@ -13,7 +13,11 @@ export class RoomService {
   ) {}
 
   createRoom(socketId: string): { roomCode: string; playerNum: 1 | 2 } {
-    const code = RoomCode.generate();
+    let code: RoomCode;
+    do {
+      code = RoomCode.generate();
+    } while (this.roomRepo.exists(code.toString()));
+
     const room = new Room(code);
     const player = room.addPlayer(socketId);
     this.roomRepo.save(room);
@@ -114,6 +118,16 @@ export class RoomService {
 
     room.updateAfterRound(hp, round);
     return info.roomCode;
+  }
+
+  endGame(roomCode: string): void {
+    const room = this.roomRepo.findByCode(roomCode);
+    if (!room) return;
+
+    for (const socketId of room.getPlayerSocketIds()) {
+      this.playerRegistry.remove(socketId);
+    }
+    this.roomRepo.delete(roomCode);
   }
 
   handleDisconnect(socketId: string): string | null {

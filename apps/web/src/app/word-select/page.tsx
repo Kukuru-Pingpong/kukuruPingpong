@@ -7,9 +7,10 @@ export default function WordSelectPage() {
   const {
     mode,
     playerNum,
-    opponentWordReady,
-    handleLocalSubmit,
-    handleOnlineSubmit,
+    sentence,
+    loading,
+    handleOnlineQuoteReady,
+    handleWordSelectRecordDone,
     p1Character,
     p2Character,
     p1Hp,
@@ -23,9 +24,10 @@ export default function WordSelectPage() {
       <WordSelectScreen
         mode={mode}
         playerNum={playerNum}
-        opponentReady={opponentWordReady}
-        onSubmitLocal={handleLocalSubmit}
-        onSubmitOnline={handleOnlineSubmit}
+        sentence={sentence}
+        loading={loading}
+        onQuoteReady={handleOnlineQuoteReady}
+        onRecordingComplete={handleWordSelectRecordDone}
         p1Character={p1Character}
         p2Character={p2Character}
         p1Hp={p1Hp}

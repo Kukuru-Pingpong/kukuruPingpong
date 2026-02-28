@@ -17,4 +17,8 @@ export class InMemoryRoomRepository implements IRoomRepository {
   delete(code: string): void {
     this.rooms.delete(code);
   }
+
+  exists(code: string): boolean {
+    return this.rooms.has(code);
+  }
 }

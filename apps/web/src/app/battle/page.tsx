@@ -18,6 +18,7 @@ export default function BattlePage() {
     recordings,
     sentence,
     nickname,
+    lastWinner,
   } = useGame();
 
   return (
@@ -35,6 +36,7 @@ export default function BattlePage() {
       recordings={recordings}
       sentence={sentence}
       nickname={nickname}
+      lastWinner={lastWinner}
     />
   );
 }

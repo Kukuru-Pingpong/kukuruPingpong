@@ -7,7 +7,7 @@ export default function OnlineLobbyPage() {
   const { resetGame, handleCreateRoom, handleJoinRoom, nickname } = useGame();
 
   return (
-    <div className="app">
+    <div style={{ background: '#8bac6d', minHeight: '100vh' }}>
       <OnlineLobbyScreen
         onBack={resetGame}
         onCreateRoom={handleCreateRoom}

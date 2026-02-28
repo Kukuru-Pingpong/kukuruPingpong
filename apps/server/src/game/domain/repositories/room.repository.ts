@@ -6,4 +6,5 @@ export interface IRoomRepository {
   save(room: Room): void;
   findByCode(code: string): Room | undefined;
   delete(code: string): void;
+  exists(code: string): boolean;
 }

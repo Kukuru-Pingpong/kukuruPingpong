@@ -43,6 +43,7 @@ interface GameContextType {
   lastDamage: { target: 1 | 2; amount: number } | null;
   isKo: boolean;
   koLoser: 1 | 2 | null;
+  lastWinner: 1 | 2 | null;
   nickname: string;
   nicknameLoaded: boolean;
 
@@ -69,6 +70,8 @@ interface GameContextType {
   handleJudge: () => Promise<void>;
   handleSelectCharacter: (character: Character, player: 1 | 2) => void;
   handleBattleComplete: () => void;
+  handleOnlineQuoteReady: (quote: { text: string; source: string }) => void;
+  handleWordSelectRecordDone: (blob: Blob, quote: { text: string; source: string }) => Promise<void>;
 }
 
 const GameContext = createContext<GameContextType | null>(null);
@@ -117,6 +120,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [lastDamage, setLastDamage] = useState<{ target: 1 | 2; amount: number } | null>(null);
   const [isKo, setIsKo] = useState(false);
   const [koLoser, setKoLoser] = useState<1 | 2 | null>(null);
+  const [lastWinner, setLastWinner] = useState<1 | 2 | null>(null);
 
   useEffect(() => {
     playerNumRef.current = playerNum;
@@ -147,6 +151,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setLastDamage(null);
     setIsKo(false);
     setKoLoser(null);
+    setLastWinner(null);
     quoteRef.current = '';
     disconnectSocket();
     cleanupAudio();
@@ -196,7 +201,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
     socket.on('sentence-generated', ({ sentence: s }: { sentence: string }) => {
       setSentence(s);
       setLoading('');
-      router.push('/recording');
     });
 
     socket.on('opponent-recording-done', () => {});
@@ -246,6 +250,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setIsKo(false);
     setKoLoser(null);
     setLastDamage(null);
+    setLastWinner(null);
     router.push('/character-select');
   }, [router]);
 
@@ -260,6 +265,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setIsKo(false);
     setKoLoser(null);
     setLastDamage(null);
+    setLastWinner(null);
     setupSocket();
     router.push('/online');
   }, [router, setupSocket]);
@@ -367,6 +373,41 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }
   }, [recordings, sentence, mode]);
 
+  // Online quote ready: P1 emits sentence via socket
+  const handleOnlineQuoteReady = useCallback((quote: { text: string; source: string }) => {
+    setSentence(quote.text);
+    setQuoteSource(quote.source);
+    socketRef.current?.emit('sentence-ready', { sentence: quote.text });
+  }, []);
+
+  // Word-select recording done: handles combined quote + recording flow
+  const handleWordSelectRecordDone = useCallback(
+    async (blob: Blob, quote: { text: string; source: string }) => {
+      setSentence(quote.text);
+      setQuoteSource(quote.source);
+
+      if (mode === 'local') {
+        setRecordings((prev) => ({ ...prev, 1: blob }));
+        setLoading('AI가 문장을 읽는 중...');
+        try {
+          const ttsBlob = await generateTts(quote.text);
+          setRecordings((prev) => ({ ...prev, 2: ttsBlob }));
+          setLoading('');
+          router.push('/battle');
+        } catch (err: any) {
+          setLoading('');
+          alert('AI 음성 생성 실패: ' + err.message);
+        }
+      } else {
+        // Online mode - send recording via socket
+        setRecordings((prev) => ({ ...prev, [playerNumRef.current]: blob }));
+        const base64 = await blobToBase64(blob);
+        socketRef.current?.emit('recording-done', { audioBase64: base64 });
+      }
+    },
+    [mode, router],
+  );
+
   // Battle complete: calculate damage, update HP, route to next round or KO
   const handleBattleComplete = useCallback(() => {
     if (!judgment) return;
@@ -395,6 +436,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }
 
     const winner = judgment.winner as 1 | 2;
+    setLastWinner(winner);
     const loser = winner === 1 ? 2 : 1;
     const winnerScore = winner === 1 ? judgment.player1_score : judgment.player2_score;
     const loserScore = loser === 1 ? judgment.player1_score : judgment.player2_score;
@@ -468,6 +510,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     lastDamage,
     isKo,
     koLoser,
+    lastWinner,
     nickname,
     nicknameLoaded,
 
@@ -494,6 +537,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
     handleJudge,
     handleSelectCharacter,
     handleBattleComplete,
+    handleOnlineQuoteReady,
+    handleWordSelectRecordDone,
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;

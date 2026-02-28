@@ -20,6 +20,7 @@ interface BattleScreenProps {
   recordings?: { 1: Blob | null; 2: Blob | null };
   sentence?: string;
   nickname: string;
+  lastWinner?: 1 | 2 | null;
 }
 
 type Phase = 'enter' | 'scores' | 'charge' | 'projectile' | 'hit' | 'hp' | 'done';
@@ -38,6 +39,7 @@ export default function BattleScreen({
   recordings,
   sentence,
   nickname,
+  lastWinner,
 }: BattleScreenProps) {
   const [phase, setPhase] = useState<Phase>('enter');
   const [displayP1Score, setDisplayP1Score] = useState(0);
@@ -54,6 +56,20 @@ export default function BattleScreen({
   const [autoPlayDone, setAutoPlayDone] = useState(false);
   const audio1Ref = useRef<HTMLAudioElement>(null);
   const audio2Ref = useRef<HTMLAudioElement>(null);
+  const seAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // 히트 효과음 재생
+  useEffect(() => {
+    if (phase === 'hit' && winner) {
+      const isCombo = lastWinner === winner;
+      const src = isCombo ? '/se/combo.wav' : '/se/hit.wav';
+      if (!seAudioRef.current) {
+        seAudioRef.current = new Audio();
+      }
+      seAudioRef.current.src = src;
+      seAudioRef.current.play().catch(() => {});
+    }
+  }, [phase, winner, lastWinner]);
 
   useEffect(() => {
     if (!judgment && onJudge && !judging) {
