@@ -30,3 +30,38 @@ https://github.com/Kukuru-Pingpong
 
 # 기술데모 (1분 분량 영상)
 *(영상 링크 또는 첨부 내용을 이곳에 기입해주세요)*
+
+---
+
+# Team Name
+Kukuru-Pingpong
+
+# GitHub Repository Link (Public)
+https://github.com/Kukuru-Pingpong
+
+# Project Description
+
+"Kukuru-Pingpong" is a real-time turn-based voice battle game utilizing popular Korean memes and famous movie quotes. During short and intense sessions (1-3 minutes), users act out famous movie quotes to compete against each other, while the Google Gemini 3 API serves as a voice judge, comparing the user's voice against the original quote to determine the winner.
+
+Going beyond mere voice recording, we integrated a quadruple AI pipeline powered by Gemini at the core of the game loop to create a highly immersive entertainment experience.
+
+### Core Features and Impact
+
+1. AI-Powered Precision Voice Judgment (Voice Judge)
+   - Analyzes both players' recorded voices using the gemini-1.5-flash model. It evaluates based on four metrics (Total 100 points): Tone, Emotion, Rhythm, and Pronunciation, providing a fair score and text feedback on the outcome.
+2. Real-Time Damage and HP Fighting System
+   - Applies an intuitive fighting game rule where a player's HP is reduced proportionally by the point difference between the two competitors.
+3. Breathless Latency Masking
+   - Evaluates the AI score in the background in real-time during the "presentation time" when the opponent's voice is played, achieving a seamless and engaging multiplayer experience without loading screens.
+4. Diverse Multi-Utilization of Gemini APIs
+   - Text Remix (Sentence Generator): Synthesizes random, wacky words with the original quote using the gemini-2.5-flash model to create inventive new lines.
+   - TTS (Text-to-Speech): Utilizes the gemini-2.5-flash-preview-tts model to convert text into high-quality voice in real-time, using it as an in-game asset.
+   - Image Generation (Image Generator): Generates unique character portraits for the players based on the gemini-3.1-flash-image-preview model.
+
+### Tech Stack
+- Frontend: Next.js 15, React 19, Socket.io-client (Web microphone recording and real-time socket communication)
+- Backend: NestJS, Socket.io (Real-time room matching and turn-based state synchronization)
+- AI / Cloud: Google Gemini API (Text, Audio Analysis, Image, TTS), Google Cloud Platform
+
+# Technical Demo (1-minute video)
+*(Please insert video link or attachment here)*
