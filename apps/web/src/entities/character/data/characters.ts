@@ -3,7 +3,7 @@ import type { Character } from '../model/types';
 export const characters: Character[] = [
   {
     id: 1,
-    name: '불꽃 대사왕',
+    name: '달빛 할배',
     emoji: '🔥',
     image: '/characters/1.png',
     auraColor: '#ff6b35',
@@ -13,7 +13,7 @@ export const characters: Character[] = [
   },
   {
     id: 2,
-    name: '눈물 여왕',
+    name: '타락파워천사',
     emoji: '💧',
     image: '/characters/2.png',
     auraColor: '#74b9ff',
@@ -23,7 +23,7 @@ export const characters: Character[] = [
   },
   {
     id: 3,
-    name: '츤데레 검사',
+    name: '잼민이',
     emoji: '⚖️',
     image: '/characters/3.png',
     auraColor: '#a29bfe',
@@ -33,7 +33,7 @@ export const characters: Character[] = [
   },
   {
     id: 4,
-    name: '열혈 형사',
+    name: '재벌3세',
     emoji: '🔍',
     image: '/characters/4.png',
     auraColor: '#fdcb6e',
@@ -43,7 +43,7 @@ export const characters: Character[] = [
   },
   {
     id: 5,
-    name: '재벌 3세',
+    name: '타락파워천사',
     emoji: '💎',
     image: '/characters/5.png',
     auraColor: '#e17055',
@@ -53,7 +53,7 @@ export const characters: Character[] = [
   },
   {
     id: 6,
-    name: '천재 해커',
+    name: '유시진 대위',
     emoji: '💻',
     image: '/characters/6.png',
     auraColor: '#00cec9',
@@ -63,7 +63,7 @@ export const characters: Character[] = [
   },
   {
     id: 7,
-    name: '전설의 조폭',
+    name: '쉬리',
     emoji: '🐉',
     image: '/characters/7.png',
     auraColor: '#d63031',
@@ -73,7 +73,7 @@ export const characters: Character[] = [
   },
   {
     id: 8,
-    name: '로맨스 요정',
+    name: '전문직',
     emoji: '✨',
     image: '/characters/8.png',
     auraColor: '#fd79a8',

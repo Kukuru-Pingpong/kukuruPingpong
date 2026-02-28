@@ -16,7 +16,7 @@ export function CharacterSelectScreen({ onSelect }: CharacterSelectScreenProps) 
         <h2 className="cs-title">SELECT CHARACTER</h2>
 
         <div className="cs-grid">
-          {characters.slice(0, 4).map((char) => (
+          {characters.map((char) => (
             <div
               key={char.id}
               className={`cs-card ${selected === String(char.id) ? 'cs-card-selected' : ''}`}

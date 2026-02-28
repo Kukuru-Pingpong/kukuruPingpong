@@ -55,8 +55,8 @@ export default function CharacterSelectScreen({
 
         <h1 style={{ fontSize: '1.2rem', textAlign: 'center', marginBottom: '8px' }}>CHOOSE YOUR FIGHTER</h1>
 
-        <div className="retro-frame" style={{ width: '100%', maxWidth: '460px', margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+        <div className="retro-frame" style={{ width: '100%', maxWidth: '460px', margin: '0 auto', padding: '8px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gridTemplateRows: 'repeat(2, 1fr)', gap: '6px' }}>
             {characters.map((char) => {
               const isLocked = isP2Turn && p1Character?.id === char.id;
               const isSelected = selected?.id === char.id;
@@ -67,7 +67,7 @@ export default function CharacterSelectScreen({
                   className={`retro-frame${isSelected ? '-dark' : ''}`}
                   onClick={() => handleCardClick(char)}
                   disabled={isLocked}
-                  style={{ 
+                  style={{
                     padding: '4px',
                     cursor: isLocked ? 'not-allowed' : 'pointer',
                     opacity: isLocked ? 0.3 : 1,
@@ -76,10 +76,16 @@ export default function CharacterSelectScreen({
                     alignItems: 'center',
                     justifyContent: 'center',
                     border: isSelected ? '4px solid var(--border)' : '2px solid var(--border)',
-                    boxShadow: isSelected ? '0 0 10px var(--border)' : 'none'
+                    boxShadow: isSelected ? '0 0 10px var(--border)' : 'none',
+                    overflow: 'hidden',
+                    position: 'relative',
                   }}
                 >
-                  <span style={{ fontSize: '2rem' }}>{char.emoji}</span>
+                  <img
+                    src={char.image}
+                    alt={char.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'pixelated' }}
+                  />
                   {isLocked && (
                     <div className="retro-badge" style={{ position: 'absolute', bottom: '2px', fontSize: '0.3rem', padding: '1px 2px' }}>P1</div>
                   )}
@@ -96,12 +102,7 @@ export default function CharacterSelectScreen({
             disabled={!selected}
             style={{ width: '100%', display: 'flex', gap: '8px' }}
           >
-            {selected ? (
-              <>
-                <span>{selected.emoji}</span>
-                <span>CONFIRM {selected.name}</span>
-              </>
-            ) : 'SELECT A FIGHTER'}
+            {selected ? `> CONFIRM ${selected.name}` : 'SELECT A FIGHTER'}
           </button>
         </div>
 
