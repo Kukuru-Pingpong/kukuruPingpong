@@ -356,7 +356,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   // Judge handler (for online, P1 auto-judges when both recordings ready)
   const handleJudge = useCallback(async () => {
     if (!recordings[1] || !recordings[2]) {
-      alert('두 녹음이 모두 필요합니다!');
+
       return;
     }
     setLoading('AI 심판이 판정 중...');
