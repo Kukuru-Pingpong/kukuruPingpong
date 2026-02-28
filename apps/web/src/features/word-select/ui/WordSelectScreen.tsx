@@ -25,6 +25,7 @@ interface WordSelectScreenProps {
   p2Hp?: number;
   round?: number;
   nickname: string;
+  onGoHome: () => void;
 }
 
 type Phase =
@@ -48,6 +49,7 @@ export default function WordSelectScreen({
   p2Hp = 3,
   round = 1,
   nickname,
+  onGoHome,
 }: WordSelectScreenProps) {
   const [phase, setPhase] = useState<Phase>('waiting');
   const [countdown, setCountdown] = useState(3);
@@ -201,13 +203,18 @@ export default function WordSelectScreen({
 
   return (
     <div className="lobby-container">
-      <header className="retro-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>
-            KUKURU PINGPONG
-          </span>
+      <header className="lobby-header">
+        <div className="lobby-header-left">
+          <span className="lobby-header-title">KUKURU PINGPONG</span>
         </div>
-        <div className="retro-badge">{nickname || 'PLAYER'}</div>
+        <div className="lobby-header-right">
+          <div className="lobby-nickname-badge">
+            nickname: {nickname || 'PLAYER'}
+          </div>
+          <button className="lobby-reset-btn" onClick={onGoHome}>
+            Go To Home
+          </button>
+        </div>
       </header>
 
       <main

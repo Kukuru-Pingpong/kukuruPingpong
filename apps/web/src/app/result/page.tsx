@@ -7,7 +7,7 @@ import { useGame } from '@/contexts/GameContext';
 
 export default function ResultPage() {
   const router = useRouter();
-  const { judgment, mode, resetGame, p1Character, p2Character, nickname } = useGame();
+  const { judgment, mode, resetGame, goHome, p1Character, p2Character, nickname } = useGame();
 
   useEffect(() => {
     if (!judgment) {
@@ -28,6 +28,7 @@ export default function ResultPage() {
         p1Character={p1Character}
         p2Character={p2Character}
         nickname={nickname}
+        onGoHome={goHome}
       />
     </div>
   );
