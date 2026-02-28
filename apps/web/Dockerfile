@@ -10,7 +10,6 @@ COPY apps/web/package.json apps/web/
 RUN pnpm install --frozen-lockfile --filter web
 COPY apps/web apps/web
 RUN pnpm --filter web build
-RUN ls -la /app/apps/web/.next/ && ls -la /app/apps/web/.next/standalone/ || echo "standalone NOT found"
 
 FROM base AS runner
 WORKDIR /app
@@ -21,6 +20,7 @@ RUN adduser --system --uid 1001 nextjs
 RUN mkdir -p ./public
 COPY --from=build --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 COPY --from=build --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=build --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
 
 USER nextjs
 
