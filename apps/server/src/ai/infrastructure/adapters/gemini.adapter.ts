@@ -11,13 +11,21 @@ import { JudgmentResult } from '../../domain/value-objects/judgment-result.vo';
 @Injectable()
 export class GeminiAdapter implements ISentenceGenerator, IVoiceJudge, ITextToSpeech, IWordGenerator, IImageGenerator {
   private genAI: GoogleGenerativeAI;
+  private apiBaseUrl: string;
+  private textModel: string;
+  private ttsModel: string;
+  private imageModel: string;
 
   constructor(private config: ConfigService) {
     this.genAI = new GoogleGenerativeAI(this.config.get<string>('GEMINI_API_KEY'));
+    this.apiBaseUrl = this.config.get<string>('GEMINI_API_BASE_URL') || 'https://generativelanguage.googleapis.com/v1beta';
+    this.textModel = this.config.get<string>('GEMINI_TEXT_MODEL') || 'gemini-3-flash-preview';
+    this.ttsModel = this.config.get<string>('GEMINI_TTS_MODEL') || 'gemini-2.5-flash-preview-tts';
+    this.imageModel = this.config.get<string>('GEMINI_IMAGE_MODEL') || 'gemini-3.1-flash-image-preview';
   }
 
   async generateSentence(word: string, quote: string): Promise<string> {
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = this.genAI.getGenerativeModel({ model: this.textModel });
 
     const prompt = `당신은 창의적인 문장 리믹서입니다.
 아래에 유명한 명대사가 주어집니다. 플레이어가 고른 단어 하나를 명대사에 자연스럽게 녹여서 새로운 문장 하나를 만들어주세요.
@@ -52,7 +60,7 @@ export class GeminiAdapter implements ISentenceGenerator, IVoiceJudge, ITextToSp
     const apiKey = this.config.get<string>('GEMINI_API_KEY');
 
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`,
+      `${this.apiBaseUrl}/models/${this.ttsModel}:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -135,7 +143,7 @@ Requirements:
 - Expressive face showing the character's personality`;
 
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${apiKey}`,
+      `${this.apiBaseUrl}/models/${this.imageModel}:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -177,7 +185,7 @@ Requirements:
     audio2MimeType: string,
     sentence: string,
   ): Promise<JudgmentResult> {
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = this.genAI.getGenerativeModel({ model: this.textModel });
 
     const prompt = `당신은 음성 연기 대회의 심사위원입니다.
 두 참가자가 같은 문장을 읽었습니다.
