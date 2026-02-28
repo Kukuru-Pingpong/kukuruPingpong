@@ -56,7 +56,7 @@ export default function LobbyScreen({
                 <p>TEST YOUR SKILL.</p>
               </div>
               <button className="retro-button lobby-card-btn" onClick={onLocal}>
-                {'> START GAME'}
+                <span className="lobby-btn-chevron">{'>'}</span> START GAME
               </button>
             </div>
           </div>
@@ -81,7 +81,7 @@ export default function LobbyScreen({
                 className="retro-button lobby-card-btn"
                 onClick={onOnline}
               >
-                {'> FIND MATCH'}
+                <span className="lobby-btn-chevron">{'>'}</span> FIND MATCH
               </button>
             </div>
           </div>
