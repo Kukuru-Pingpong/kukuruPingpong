@@ -2190,7 +2190,6 @@ h2 {
   gap: 24px;
   padding: 20px;
   width: 100%;
-  max-width: 500px;
 }
 
 .cs-title {
@@ -2202,14 +2201,11 @@ h2 {
 
 .cs-grid {
   display: flex;
-  gap: 20px;
-  width: 100%;
   justify-content: center;
+  gap: 20px;
 }
 
 .cs-card {
-  flex: 1;
-  max-width: 200px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -2230,7 +2226,7 @@ h2 {
 }
 
 .cs-portrait {
-  width: 100%;
+  width: 124px;
   aspect-ratio: 3 / 4;
   overflow: hidden;
   border: 3px solid #1a2e1a;

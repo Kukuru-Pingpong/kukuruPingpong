@@ -1,53 +1,18 @@
 'use client';
 
-import { useState } from 'react';
-import { TitleScreen, CharacterSelectScreen, NicknamePopup } from '@/features/title';
+import { useRouter } from 'next/navigation';
+import { TitleScreen } from '@/features/title';
 import { LobbyScreen } from '@/features/lobby';
 import { useGame } from '@/contexts/GameContext';
 
-type Phase = 'title' | 'character' | 'nickname' | 'lobby';
+export default function HomePage() {
+  const router = useRouter();
+  const { handleLocal, handleOnline, nickname, nicknameLoaded } = useGame();
 
-const CHARACTER_IMAGES: Record<string, string> = {
-  robot: '/characters/robot.png',
-  soldier: '/characters/soldier.png',
-};
+  if (!nicknameLoaded) return null;
 
-export default function LobbyPage() {
-  const { handleLocal, handleOnline, nickname, setNickname } = useGame();
-  const [phase, setPhase] = useState<Phase>('title');
-  const [selectedChar, setSelectedChar] = useState<string>('');
-
-  if (phase === 'title') {
-    return <TitleScreen onStart={() => setPhase('character')} />;
-  }
-
-  if (phase === 'character') {
-    return (
-      <CharacterSelectScreen
-        onSelect={(charId) => {
-          setSelectedChar(charId);
-          if (nickname) {
-            setPhase('lobby');
-          } else {
-            setPhase('nickname');
-          }
-        }}
-      />
-    );
-  }
-
-  if (phase === 'nickname') {
-    return (
-      <div className="title-screen">
-        <NicknamePopup
-          characterImage={CHARACTER_IMAGES[selectedChar] || '/characters/robot.png'}
-          onComplete={(name) => {
-            setNickname(name);
-            setPhase('lobby');
-          }}
-        />
-      </div>
-    );
+  if (!nickname) {
+    return <TitleScreen onStart={() => router.push('/avatar')} />;
   }
 
   return (

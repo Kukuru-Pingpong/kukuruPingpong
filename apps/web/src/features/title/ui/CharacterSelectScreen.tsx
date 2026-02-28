@@ -1,11 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-
-const CHARACTERS = [
-  { id: 'robot', name: 'CYBORG', image: '/characters/robot.png' },
-  { id: 'soldier', name: 'SOLDIER', image: '/characters/soldier.png' },
-];
+import { characters } from '@/entities/character/data/characters';
 
 interface CharacterSelectScreenProps {
   onSelect: (characterId: string) => void;
@@ -20,11 +16,11 @@ export function CharacterSelectScreen({ onSelect }: CharacterSelectScreenProps) 
         <h2 className="cs-title">SELECT CHARACTER</h2>
 
         <div className="cs-grid">
-          {CHARACTERS.map((char) => (
+          {characters.slice(0, 4).map((char) => (
             <div
               key={char.id}
-              className={`cs-card ${selected === char.id ? 'cs-card-selected' : ''}`}
-              onClick={() => setSelected(char.id)}
+              className={`cs-card ${selected === String(char.id) ? 'cs-card-selected' : ''}`}
+              onClick={() => setSelected(String(char.id))}
             >
               <div className="cs-portrait">
                 <img src={char.image} alt={char.name} className="cs-image" />
