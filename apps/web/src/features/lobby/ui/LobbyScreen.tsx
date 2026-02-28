@@ -18,13 +18,14 @@ export default function LobbyScreen({
       {/* Header */}
       <header className="lobby-header">
         <div className="lobby-header-left">
-          <span className="lobby-header-icon">🎮</span>
           <span className="lobby-header-title">KUKURU PINGPONG</span>
         </div>
         <div className="lobby-header-right">
-          <div className="lobby-nickname-badge">👤 {nickname || 'PLAYER'}</div>
+          <div className="lobby-nickname-badge">
+            nickname: {nickname || 'PLAYER'}
+          </div>
           <button className="lobby-reset-btn" onClick={onReset}>
-            RESET
+            Go To Home
           </button>
         </div>
       </header>

@@ -2166,9 +2166,13 @@ h2 {
   color: var(--text-light);
   font-family: var(--font-pixel);
   font-size: 0.55rem;
-  padding: 6px 12px;
+  padding: 4px 12px;
   border: 2px solid var(--border-light);
   letter-spacing: 1px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .lobby-reset-btn {
@@ -2176,10 +2180,14 @@ h2 {
   border: 2px solid var(--border-light);
   color: var(--text-light);
   font-family: var(--font-pixel);
-  font-size: 0.45rem;
-  padding: 6px 12px;
+  font-size: 0.55rem;
+  padding: 4px 12px;
   cursor: pointer;
   letter-spacing: 1px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .lobby-main {
