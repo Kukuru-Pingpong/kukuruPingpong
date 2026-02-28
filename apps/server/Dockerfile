@@ -11,7 +11,7 @@ COPY tsconfig.base.json ./
 RUN pnpm install --frozen-lockfile --filter server
 COPY apps/server apps/server
 RUN pnpm --filter server build
-RUN pnpm --filter server deploy /app/deploy
+RUN pnpm --filter server deploy --legacy /app/deploy
 
 FROM base AS runner
 WORKDIR /app
