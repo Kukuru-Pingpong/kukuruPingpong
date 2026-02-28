@@ -37,7 +37,7 @@ export default function BattleHud({ p1Character, p2Character, p1Hp, p2Hp, round 
       margin: '0 auto 20px'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <span style={{ fontSize: '1.5rem' }}>{p1Character.emoji}</span>
+        <img src={p1Character.image} alt={p1Character.name} style={{ width: '36px', height: '36px', objectFit: 'cover', imageRendering: 'pixelated', borderRadius: '4px' }} />
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <span style={{ fontSize: '0.45rem' }}>P1: {p1Character.name}</span>
           <div style={{ display: 'flex', gap: '2px' }}>{renderHearts(p1Hp)}</div>
@@ -54,7 +54,7 @@ export default function BattleHud({ p1Character, p2Character, p1Hp, p2Hp, round 
           <span style={{ fontSize: '0.45rem' }}>P2: {p2Character.name}</span>
           <div style={{ display: 'flex', gap: '2px' }}>{renderHearts(p2Hp)}</div>
         </div>
-        <span style={{ fontSize: '1.5rem' }}>{p2Character.emoji}</span>
+        <img src={p2Character.image} alt={p2Character.name} style={{ width: '36px', height: '36px', objectFit: 'cover', imageRendering: 'pixelated', borderRadius: '4px' }} />
       </div>
     </div>
   );

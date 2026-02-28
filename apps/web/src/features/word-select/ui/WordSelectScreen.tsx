@@ -148,7 +148,7 @@ export default function WordSelectScreen({
         <div className="retro-badge">{nickname || 'PLAYER'}</div>
       </header>
 
-      <main className="screen" style={{ paddingTop: '80px', flexDirection: 'column', gap: '16px' }}>
+      <main className="screen" style={{ paddingTop: '80px', flexDirection: 'column', gap: '16px', alignItems: 'center' }}>
         <BattleHud
           p1Character={p1Character ?? null}
           p2Character={p2Character ?? null}
