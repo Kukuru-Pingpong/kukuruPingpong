@@ -1,0 +1,13 @@
+{
+  "name": "kukurupingpong",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:server": "pnpm --filter server dev",
+    "dev:web": "pnpm --filter web dev",
+    "dev": "pnpm run --parallel dev:server dev:web",
+    "build:server": "pnpm --filter server build",
+    "build:web": "pnpm --filter web build",
+    "build": "pnpm run --parallel build:server build:web"
+  }
+}
