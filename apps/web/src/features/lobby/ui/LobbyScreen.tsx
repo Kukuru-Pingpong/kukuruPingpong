@@ -41,7 +41,13 @@ export default function LobbyScreen({
         {/* Mode Cards */}
         <div className="lobby-cards">
           {/* VS CPU */}
-          <div className="lobby-card">
+          <div
+            className="lobby-card"
+            onClick={onLocal}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onLocal(); }}
+          >
             <div className="lobby-card-thumb">
               <img
                 src="/characters/cpu.png"
@@ -56,14 +62,20 @@ export default function LobbyScreen({
                 <p>TRAINING MODE.</p>
                 <p>TEST YOUR SKILL.</p>
               </div>
-              <button className="retro-button lobby-card-btn" onClick={onLocal}>
+              <div className="retro-button lobby-card-btn">
                 <span className="lobby-btn-chevron">{'>'}</span> START GAME
-              </button>
+              </div>
             </div>
           </div>
 
           {/* VS HUMAN */}
-          <div className="lobby-card">
+          <div
+            className="lobby-card"
+            onClick={onOnline}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onOnline(); }}
+          >
             <div className="lobby-card-thumb">
               <img
                 src="/characters/human.png"
@@ -78,12 +90,9 @@ export default function LobbyScreen({
                 <p>MULTIPLAYER.</p>
                 <p>FIGHT REAL PLAYERS.</p>
               </div>
-              <button
-                className="retro-button lobby-card-btn"
-                onClick={onOnline}
-              >
+              <div className="retro-button lobby-card-btn">
                 <span className="lobby-btn-chevron">{'>'}</span> FIND MATCH
-              </button>
+              </div>
             </div>
           </div>
         </div>
