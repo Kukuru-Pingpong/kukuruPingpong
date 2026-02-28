@@ -206,7 +206,7 @@ export default function BattleScreen({
           <div className="retro-badge">{nickname || 'PLAYER'}</div>
         </header>
 
-        <main className="screen" style={{ paddingTop: '100px', flexDirection: 'column', gap: '24px' }}>
+        <main className="screen" style={{ paddingTop: '100px', flexDirection: 'column', gap: '24px', alignItems: 'center' }}>
           {sentence && (
             <div className="retro-frame-dark" style={{ width: '100%', maxWidth: '460px', textAlign: 'center' }}>
               <p style={{ fontSize: '0.8rem', lineHeight: '1.6' }}>"{sentence}"</p>
@@ -215,13 +215,13 @@ export default function BattleScreen({
 
           <div style={{ display: 'flex', gap: '16px', width: '100%', maxWidth: '460px' }}>
             <div className={`retro-frame${nowPlaying === 1 ? '-dark' : ''}`} style={{ flex: 1, textAlign: 'center' }}>
-              <span style={{ fontSize: '3rem' }}>{p1Character?.emoji}</span>
+              <img src={p1Character?.image} alt={p1Character?.name} style={{ width: '64px', height: '64px', objectFit: 'cover', imageRendering: 'pixelated' }} />
               <div className="retro-badge" style={{ fontSize: '0.45rem', marginTop: '8px' }}>P1</div>
               <audio ref={audio1Ref} />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', fontSize: '1.5rem', fontWeight: 'bold' }}>VS</div>
             <div className={`retro-frame${nowPlaying === 1 ? '-dark' : ''}`} style={{ flex: 1, textAlign: 'center' }}>
-              <span style={{ fontSize: '3rem' }}>{p2Character?.emoji}</span>
+              <img src={p2Character?.image} alt={p2Character?.name} style={{ width: '64px', height: '64px', objectFit: 'cover', imageRendering: 'pixelated' }} />
               <div className="retro-badge" style={{ fontSize: '0.45rem', marginTop: '8px' }}>P2</div>
               <audio ref={audio2Ref} />
             </div>
@@ -245,7 +245,7 @@ export default function BattleScreen({
         <div className="retro-badge">{nickname || 'PLAYER'}</div>
       </header>
 
-      <main className="screen" style={{ paddingTop: '100px', flexDirection: 'column', gap: '20px' }}>
+      <main className="screen" style={{ paddingTop: '100px', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
         <BattleHud
           p1Character={p1Character}
           p2Character={p2Character}
@@ -254,34 +254,57 @@ export default function BattleScreen({
           round={round}
         />
 
-        <div className="battle-arena" style={{ width: '100%', maxWidth: '460px', height: '300px', position: 'relative' }}>
+        <div
+          className="battle-arena"
+          style={{
+            width: '100%',
+            maxWidth: '460px',
+            height: '300px',
+            position: 'relative',
+            animation: phase === 'hit' ? 'hitShake 0.4s ease-in-out' : 'none',
+          }}
+        >
+          {/* Hit flash overlay */}
+          {phase === 'hit' && (
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: '#fff',
+              zIndex: 10,
+              animation: 'hitFlash 0.4s forwards',
+              pointerEvents: 'none',
+            }} />
+          )}
+
           {/* Battle Characters */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center', 
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             width: '100%',
             marginTop: '40px'
           }}>
             {/* P1 */}
-            <div style={{ 
+            <div style={{
               textAlign: 'center',
+              position: 'relative',
               transform: phase === 'charge' && winner === 1 ? 'scale(1.2)' : 'none',
               transition: 'all 0.2s',
-              opacity: phase === 'hit' && loser === 1 ? 0.5 : 1
+              animation: phase === 'hit' && loser === 1 ? 'hitRecoilLeft 0.4s ease-out' : 'none',
+              opacity: phase === 'hit' && loser === 1 ? 0.5 : 1,
             }}>
-              <span style={{ fontSize: '4rem', filter: phase === 'charge' && winner === 1 ? 'drop-shadow(0 0 10px var(--border))' : 'none' }}>
-                {p1Character?.emoji}
-              </span>
+              <img src={p1Character?.image} alt={p1Character?.name} style={{ width: '80px', height: '80px', objectFit: 'cover', imageRendering: 'pixelated', filter: phase === 'charge' && winner === 1 ? 'drop-shadow(0 0 10px var(--border))' : 'none' }} />
               {(phase === 'hit' || phase === 'hp') && loser === 1 && (
-                <div style={{ 
-                  position: 'absolute', 
-                  top: '-40px', 
-                  left: '20px', 
-                  fontSize: '1.5rem', 
+                <div style={{
+                  position: 'absolute',
+                  top: '-40px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  fontSize: '1.5rem',
                   color: '#ff0000',
                   fontFamily: 'var(--font-pixel)',
-                  animation: 'damageFloat 1s forwards'
+                  animation: 'damageFloat 1s forwards',
+                  zIndex: 20,
                 }}>-{damage}</div>
               )}
             </div>
@@ -289,28 +312,88 @@ export default function BattleScreen({
             <div style={{ fontSize: '1.5rem', fontWeight: 'bold', opacity: 0.3 }}>VS</div>
 
             {/* P2 */}
-            <div style={{ 
+            <div style={{
               textAlign: 'center',
+              position: 'relative',
               transform: phase === 'charge' && winner === 2 ? 'scale(1.2)' : 'none',
               transition: 'all 0.2s',
-              opacity: phase === 'hit' && loser === 2 ? 0.5 : 1
+              animation: phase === 'hit' && loser === 2 ? 'hitRecoil 0.4s ease-out' : 'none',
+              opacity: phase === 'hit' && loser === 2 ? 0.5 : 1,
             }}>
-              <span style={{ fontSize: '4rem', filter: phase === 'charge' && winner === 2 ? 'drop-shadow(0 0 10px var(--border))' : 'none' }}>
-                {p2Character?.emoji}
-              </span>
+              <img src={p2Character?.image} alt={p2Character?.name} style={{ width: '80px', height: '80px', objectFit: 'cover', imageRendering: 'pixelated', filter: phase === 'charge' && winner === 2 ? 'drop-shadow(0 0 10px var(--border))' : 'none' }} />
               {(phase === 'hit' || phase === 'hp') && loser === 2 && (
-                <div style={{ 
-                  position: 'absolute', 
-                  top: '-40px', 
-                  right: '20px', 
-                  fontSize: '1.5rem', 
+                <div style={{
+                  position: 'absolute',
+                  top: '-40px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  fontSize: '1.5rem',
                   color: '#ff0000',
                   fontFamily: 'var(--font-pixel)',
-                  animation: 'damageFloat 1s forwards'
+                  animation: 'damageFloat 1s forwards',
+                  zIndex: 20,
                 }}>-{damage}</div>
               )}
             </div>
           </div>
+
+          {/* Impact burst on hit */}
+          {phase === 'hit' && winner && (
+            <>
+              {/* Center burst */}
+              <div style={{
+                position: 'absolute',
+                top: '40%',
+                left: loser === 1 ? '15%' : '85%',
+                width: '60px',
+                height: '60px',
+                background: 'radial-gradient(circle, #fff 0%, #ffaa00 40%, transparent 70%)',
+                borderRadius: '50%',
+                animation: 'impactBurst 0.4s ease-out forwards',
+                zIndex: 15,
+                pointerEvents: 'none',
+              }} />
+              {/* Shockwave ring */}
+              <div style={{
+                position: 'absolute',
+                top: '40%',
+                left: loser === 1 ? '15%' : '85%',
+                width: '40px',
+                height: '40px',
+                border: '4px solid #ffaa00',
+                borderRadius: '50%',
+                animation: 'impactRing 0.5s ease-out forwards',
+                zIndex: 15,
+                pointerEvents: 'none',
+              }} />
+              {/* Sparks */}
+              {[0, 1, 2, 3, 4, 5].map((i) => {
+                const angle = (i * 60) * (Math.PI / 180);
+                const dist = 40 + Math.random() * 20;
+                const tx = Math.cos(angle) * dist;
+                const ty = Math.sin(angle) * dist;
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      position: 'absolute',
+                      top: '40%',
+                      left: loser === 1 ? '15%' : '85%',
+                      width: '6px',
+                      height: '6px',
+                      background: i % 2 === 0 ? '#fff' : '#ffaa00',
+                      borderRadius: '50%',
+                      animation: `sparkOut 0.4s ease-out forwards`,
+                      animationDelay: `${i * 30}ms`,
+                      transform: `translate(${tx}px, ${ty}px)`,
+                      zIndex: 16,
+                      pointerEvents: 'none',
+                    }}
+                  />
+                );
+              })}
+            </>
+          )}
 
           {/* Projectile */}
           {phase === 'projectile' && winner && (

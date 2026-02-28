@@ -76,7 +76,7 @@ export default function KoScreen({
               transition: 'all 0.5s'
             }}>
               <div className="retro-frame" style={{ padding: '8px', background: winner === 1 ? 'var(--bg-surface)' : 'var(--bg-card)' }}>
-                <span style={{ fontSize: '4rem' }}>{p1Character?.emoji}</span>
+                <img src={p1Character?.image} alt={p1Character?.name} style={{ width: '80px', height: '80px', objectFit: 'cover', imageRendering: 'pixelated' }} />
               </div>
               <div className="retro-badge" style={{ marginTop: '12px' }}>{winner === 1 ? 'WINNER' : 'LOSER'}</div>
             </div>
@@ -88,7 +88,7 @@ export default function KoScreen({
               transition: 'all 0.5s'
             }}>
               <div className="retro-frame" style={{ padding: '8px', background: winner === 2 ? 'var(--bg-surface)' : 'var(--bg-card)' }}>
-                <span style={{ fontSize: '4rem' }}>{p2Character?.emoji}</span>
+                <img src={p2Character?.image} alt={p2Character?.name} style={{ width: '80px', height: '80px', objectFit: 'cover', imageRendering: 'pixelated' }} />
               </div>
               <div className="retro-badge" style={{ marginTop: '12px' }}>{winner === 2 ? 'WINNER' : 'LOSER'}</div>
             </div>

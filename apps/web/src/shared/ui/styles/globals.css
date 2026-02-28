@@ -1421,6 +1421,55 @@ h2 {
   75% { transform: translateX(5px) rotate(2deg); }
 }
 
+/* === Hit Effects === */
+@keyframes hitShake {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-6px); }
+  20% { transform: translateX(6px); }
+  30% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  50% { transform: translateX(-2px); }
+  60% { transform: translateX(2px); }
+}
+
+@keyframes hitFlash {
+  0% { opacity: 0; }
+  10% { opacity: 0.6; }
+  20% { opacity: 0; }
+  30% { opacity: 0.4; }
+  50% { opacity: 0; }
+}
+
+@keyframes impactBurst {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+  50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.8; }
+  100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}
+
+@keyframes impactRing {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 1; border-width: 6px; }
+  100% { transform: translate(-50%, -50%) scale(3); opacity: 0; border-width: 1px; }
+}
+
+@keyframes sparkOut {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes hitRecoil {
+  0% { transform: translateX(0) rotate(0); }
+  30% { transform: translateX(15px) rotate(8deg); }
+  60% { transform: translateX(-5px) rotate(-3deg); }
+  100% { transform: translateX(0) rotate(0); }
+}
+
+@keyframes hitRecoilLeft {
+  0% { transform: translateX(0) rotate(0); }
+  30% { transform: translateX(-15px) rotate(-8deg); }
+  60% { transform: translateX(5px) rotate(3deg); }
+  100% { transform: translateX(0) rotate(0); }
+}
+
 .ko-characters {
   display: flex;
   align-items: center;
