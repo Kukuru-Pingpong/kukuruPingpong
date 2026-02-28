@@ -5,9 +5,15 @@
   "scripts": {
     "dev:server": "pnpm --filter server dev",
     "dev:web": "pnpm --filter web dev",
-    "dev": "pnpm run --parallel dev:server dev:web",
+    "dev": "turbo dev",
     "build:server": "pnpm --filter server build",
     "build:web": "pnpm --filter web build",
-    "build": "pnpm run --parallel build:server build:web"
-  }
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "start": "turbo start"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0"
+  },
+  "packageManager": "pnpm@9.15.0"
 }
