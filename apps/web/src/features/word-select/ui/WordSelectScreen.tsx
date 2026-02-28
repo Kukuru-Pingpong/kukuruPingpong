@@ -105,26 +105,46 @@ export default function WordSelectScreen({
     return () => clearTimeout(t);
   }, [phase]);
 
-  // Phase: playing-audio → play original audio, then countdown
+  // Phase: playing-audio → play original audio, then countdown (min 7s)
   useEffect(() => {
     if (phase !== 'playing-audio') return;
+
+    let audioEnded = false;
+    let timerDone = false;
+    let cancelled = false;
+
+    const tryAdvance = () => {
+      if (audioEnded && timerDone && !cancelled) {
+        setPhase('countdown');
+      }
+    };
 
     const audio = new Audio(`/audio/${quote.audio}`);
     audioRef.current = audio;
 
     audio.onended = () => {
-      setPhase('countdown');
+      audioEnded = true;
+      tryAdvance();
     };
 
     audio.onerror = () => {
-      setPhase('countdown');
+      audioEnded = true;
+      tryAdvance();
     };
 
     audio.play().catch(() => {
-      setPhase('countdown');
+      audioEnded = true;
+      tryAdvance();
     });
 
+    const minTimer = setTimeout(() => {
+      timerDone = true;
+      tryAdvance();
+    }, 7000);
+
     return () => {
+      cancelled = true;
+      clearTimeout(minTimer);
       audio.pause();
       audio.src = '';
     };

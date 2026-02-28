@@ -114,36 +114,6 @@ export default function VictoryScreen({
                   alt={winnerChar?.name}
                   style={{ width: '120px', height: '120px', objectFit: 'cover', imageRendering: 'pixelated' }}
                 />
-                {judgment?.reason && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '-40px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    background: 'var(--bg-card)',
-                    color: 'var(--text-light)',
-                    border: '2px solid var(--border)',
-                    padding: '4px 8px',
-                    fontSize: '0.35rem',
-                    lineHeight: '1.4',
-                    width: '130px',
-                    textAlign: 'center',
-                    whiteSpace: 'pre-wrap',
-                  }}>
-                    &quot;{judgment.reason}&quot;
-                    <div style={{
-                      position: 'absolute',
-                      bottom: '-6px',
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      width: 0,
-                      height: 0,
-                      borderLeft: '6px solid transparent',
-                      borderRight: '6px solid transparent',
-                      borderTop: '6px solid var(--bg-card)',
-                    }} />
-                  </div>
-                )}
               </div>
               <div style={{ fontSize: '0.5rem', fontFamily: 'var(--font-pixel)', textAlign: 'center' }}>
                 PLAYER {winner}
