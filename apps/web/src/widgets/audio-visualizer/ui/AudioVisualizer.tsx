@@ -10,9 +10,9 @@ interface AudioVisualizerProps {
 const BAR_COUNT = 48;
 const BAR_GAP = 2;
 const SMOOTHING = 0.82;
-const COLOR_TOP = '#6c5ce7';
-const COLOR_MID = '#a29bfe';
-const COLOR_BOT = '#fd79a8';
+const COLOR_TOP = '#9bbc0f';
+const COLOR_MID = '#8bac0f';
+const COLOR_BOT = '#306230';
 
 export default function AudioVisualizer({ stream, isActive }: AudioVisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -46,9 +46,9 @@ export default function AudioVisualizer({ stream, isActive }: AudioVisualizerPro
       for (let i = 0; i < BAR_COUNT; i++) {
         const x = i * (barWidth + BAR_GAP);
         const h = 2;
-        ctx.fillStyle = 'rgba(108, 92, 231, 0.3)';
+        ctx.fillStyle = 'rgba(155, 188, 15, 0.3)';
         ctx.beginPath();
-        ctx.roundRect(x, centerY - h / 2, barWidth, h, 1);
+        ctx.rect(x, centerY - h / 2, barWidth, h);
         ctx.fill();
       }
       return;
@@ -94,17 +94,17 @@ export default function AudioVisualizer({ stream, isActive }: AudioVisualizerPro
 
         // Upper half
         ctx.beginPath();
-        ctx.roundRect(x, centerY - barHeight, barWidth, barHeight, 2);
+        ctx.rect(x, centerY - barHeight, barWidth, barHeight);
         ctx.fill();
 
         // Lower half (mirror)
         ctx.beginPath();
-        ctx.roundRect(x, centerY, barWidth, barHeight, 2);
+        ctx.rect(x, centerY, barWidth, barHeight);
         ctx.fill();
       }
 
       // Subtle glow on center line
-      ctx.fillStyle = 'rgba(162, 155, 254, 0.15)';
+      ctx.fillStyle = 'rgba(139, 172, 15, 0.15)';
       ctx.fillRect(0, centerY - 0.5, drawWidth, 1);
     };
 
@@ -122,10 +122,11 @@ export default function AudioVisualizer({ stream, isActive }: AudioVisualizerPro
       ref={canvasRef}
       style={{
         width: '100%',
-        height: '100px',
-        borderRadius: '10px',
+        height: '60px',
+        borderRadius: '0px',
         background: 'var(--bg-card)',
         display: 'block',
+        border: '2px solid var(--border)'
       }}
     />
   );

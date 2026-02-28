@@ -43,6 +43,7 @@ interface GameContextType {
   lastDamage: { target: 1 | 2; amount: number } | null;
   isKo: boolean;
   koLoser: 1 | 2 | null;
+  nickname: string;
 
   setMode: (mode: 'local' | 'online') => void;
   setSentence: (s: string) => void;
@@ -53,6 +54,7 @@ interface GameContextType {
   setLoading: (s: string) => void;
   setPlayerNum: (n: number) => void;
   setOpponentWordReady: (b: boolean) => void;
+  setNickname: (name: string) => void;
 
   resetGame: () => void;
   setupSocket: () => Socket;
@@ -80,6 +82,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   const [mode, setMode] = useState<'local' | 'online'>('local');
+  const [nickname, setNickname] = useState(() =>
+    typeof window !== 'undefined' ? localStorage.getItem('kukuru_nickname') || '' : ''
+  );
   const [loading, setLoading] = useState('');
   const [sentence, setSentence] = useState('');
   const [quoteSource, setQuoteSource] = useState('');
@@ -360,6 +365,29 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const handleBattleComplete = useCallback(() => {
     if (!judgment) return;
 
+    // Handle tie (winner === 0): no damage, just continue to next round
+    if (judgment.winner === 0) {
+      setTimeout(() => {
+        setRound((r) => r + 1);
+        setSentence('');
+        setQuoteSource('');
+        setRecordings({ 1: null, 2: null });
+        setCurrentPlayer(1);
+        setJudgment(null);
+        setOpponentWordReady(false);
+        router.push('/word-select');
+
+        if (mode === 'online' && playerNumRef.current === 1) {
+          socketRef.current?.emit('round-complete', {
+            hp: { 1: p1Hp, 2: p2Hp },
+            round: round + 1,
+            ko: false,
+          });
+        }
+      }, 500);
+      return;
+    }
+
     const winner = judgment.winner as 1 | 2;
     const loser = winner === 1 ? 2 : 1;
     const winnerScore = winner === 1 ? judgment.player1_score : judgment.player2_score;
@@ -434,6 +462,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     lastDamage,
     isKo,
     koLoser,
+    nickname,
 
     setMode,
     setSentence,
@@ -444,6 +473,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setLoading,
     setPlayerNum,
     setOpponentWordReady,
+    setNickname,
 
     resetGame,
     setupSocket,

@@ -1,9 +1,8 @@
-const MIN_DAMAGE = 5;
-
 export class BattleService {
   static calculateDamage(winnerScore: number, loserScore: number): number {
-    const raw = winnerScore - loserScore;
-    return Math.max(raw, MIN_DAMAGE);
+    // PRD formula: ceil(1 + |scoreDiff| / 20), capped at 2
+    const scoreDiff = Math.abs(winnerScore - loserScore);
+    return Math.min(2, Math.ceil(1 + scoreDiff / 20));
   }
 
   static isKo(hp: number): boolean {

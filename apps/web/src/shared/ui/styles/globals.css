@@ -1,3 +1,142 @@
+:root {
+  /* Retro Game Boy Green Palette */
+  --retro-bg-darkest: #0f380f;
+  --retro-bg-dark: #306230;
+  --retro-bg-medium: #8bac0f;
+  --retro-bg-light: #9bbc0f;
+
+  --bg-main: var(--retro-bg-light);
+  --bg-card: var(--retro-bg-darkest);
+  --bg-surface: var(--retro-bg-medium);
+  --text-primary: var(--retro-bg-darkest);
+  --text-light: var(--retro-bg-light);
+  --primary: var(--retro-bg-medium);
+  --accent: var(--retro-bg-dark);
+  --border: var(--retro-bg-darkest);
+
+  /* Legacy aliases for compatibility */
+  --bg: var(--retro-bg-light);
+  --bg-secondary: var(--retro-bg-medium);
+  --bg-card-hover: var(--retro-bg-dark);
+  --primary-hover: var(--retro-bg-dark);
+  --primary-dark: var(--retro-bg-darkest);
+  --secondary: var(--retro-bg-dark);
+  --text: var(--retro-bg-darkest);
+  --text-secondary: var(--retro-bg-dark);
+  --text-muted: var(--retro-bg-dark);
+  --text-dim: var(--retro-bg-dark);
+  --text-on-dark: var(--retro-bg-light);
+  --border-light: var(--retro-bg-medium);
+
+  --radius: 0px; /* Retro feel uses square corners */
+  --radius-sm: 0px;
+  --font-pixel: 'Press Start 2P', 'DungGeunMo', monospace;
+  --font-main: 'Press Start 2P', 'DungGeunMo', monospace;
+}
+
+body {
+  font-family: var(--font-pixel), monospace;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  image-rendering: pixelated;
+}
+
+/* ========================
+   Retro UI Classes
+   ======================== */
+.retro-frame {
+  background: var(--bg-surface);
+  border: 4px solid var(--border);
+  box-shadow: 4px 4px 0px 0px var(--border);
+  padding: 16px;
+  position: relative;
+}
+
+.retro-frame-dark {
+  background: var(--bg-card);
+  border: 4px solid var(--border);
+  color: var(--text-light);
+  padding: 16px;
+}
+
+.retro-button {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  color: var(--text-light);
+  font-family: var(--font-pixel);
+  font-size: 0.75rem;
+  padding: 12px 20px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px 0px var(--border);
+  transition: all 0.1s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+}
+
+.retro-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px 0px var(--border);
+}
+
+.retro-button-light {
+  background: var(--bg-surface);
+  border: 2px solid var(--border);
+  color: var(--text-primary);
+  font-family: var(--font-pixel);
+  font-size: 0.75rem;
+  padding: 12px 20px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px 0px var(--border);
+  transition: all 0.1s;
+}
+
+.retro-button-light:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px 0px var(--border);
+}
+
+.retro-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: var(--bg-card);
+  border-bottom: 4px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 1000;
+  color: var(--text-light);
+}
+
+.retro-badge {
+  background: var(--bg-card);
+  color: var(--text-light);
+  padding: 4px 8px;
+  font-size: 0.5rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: inline-block;
+  border: 1px solid var(--border);
+}
+
+.retro-badge-light {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  padding: 4px 8px;
+  font-size: 0.5rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: inline-block;
+  border: 1px solid var(--border);
+}
+
 /* ========================
    Reset & Base
    ======================== */
@@ -5,32 +144,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-:root {
-  --primary: #6c5ce7;
-  --primary-dark: #5a4bd1;
-  --secondary: #00cec9;
-  --accent: #fd79a8;
-  --bg: #0a0a1a;
-  --bg-card: #1a1a2e;
-  --bg-card-hover: #25254a;
-  --text: #f0f0f0;
-  --text-dim: #a0a0b0;
-  --p1-color: #74b9ff;
-  --p2-color: #fd79a8;
-  --success: #00b894;
-  --danger: #d63031;
-  --radius: 16px;
-  --radius-sm: 10px;
-}
-
-body {
-  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
 }
 
 /* ========================
@@ -1406,4 +1519,614 @@ h2 {
 .recording-avatar-name {
   font-size: 0.9rem;
   font-weight: 700;
+}
+
+/* ===== GAME BOY ONLINE LOBBY ===== */
+.gb-online-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.gb-online-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gb-section-label {
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+
+.gb-action-btn {
+  background: var(--bg-card-hover);
+  border: 2px solid var(--border);
+  color: var(--text-on-dark);
+  font-family: var(--font-pixel);
+  font-size: 0.6rem;
+  padding: 10px 16px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: background 0.1s;
+}
+
+.gb-action-btn:hover {
+  background: var(--border);
+}
+
+.gb-online-divider {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  color: var(--accent);
+  text-align: center;
+}
+
+.gb-join-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gb-input {
+  background: transparent;
+  border: 2px solid var(--border);
+  color: var(--text-on-dark);
+  font-family: var(--font-pixel);
+  font-size: 0.65rem;
+  padding: 8px 12px;
+  width: 100%;
+  outline: none;
+  letter-spacing: 2px;
+}
+
+.gb-input::placeholder {
+  color: var(--accent);
+  opacity: 0.6;
+}
+
+.gb-input:focus {
+  border-color: var(--text-on-dark);
+}
+
+.gb-waiting {
+  text-align: center;
+  padding: 16px 0;
+}
+
+.gb-room-code {
+  font-family: var(--font-pixel);
+  font-size: 1.5rem;
+  color: var(--text-on-dark);
+  letter-spacing: 4px;
+  margin: 12px 0;
+  border: 2px solid var(--border);
+  padding: 8px;
+}
+
+.gb-waiting-text {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  color: var(--accent);
+  margin-top: 12px;
+}
+
+.gb-dots span {
+  animation: gb-blink 1s step-end infinite;
+}
+.gb-dots span:nth-child(2) { animation-delay: 0.33s; }
+.gb-dots span:nth-child(3) { animation-delay: 0.66s; }
+
+.gb-back-btn {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  cursor: pointer;
+  padding: 8px 0;
+  letter-spacing: 1px;
+}
+
+.gb-back-btn:hover {
+  color: var(--text-on-dark);
+}
+
+/* ===== GAME BOY RECORDING SCREEN ===== */
+.gb-recording-frame {
+  max-width: 400px;
+}
+
+.gb-rec-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.gb-rec-player {
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  color: var(--text-on-dark);
+}
+
+.gb-rec-hearts {
+  display: flex;
+  gap: 4px;
+}
+
+.gb-heart {
+  font-size: 1rem;
+  color: var(--text-on-dark);
+}
+.gb-heart-empty {
+  opacity: 0.3;
+}
+
+.gb-rec-round {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  color: var(--accent);
+}
+
+.gb-rec-char-name {
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  color: var(--accent);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.gb-quote-box {
+  background: var(--bg-card-hover);
+  border: 2px solid var(--border);
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.gb-quote-label {
+  font-family: var(--font-pixel);
+  font-size: 0.4rem;
+  color: var(--accent);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.gb-quote-text {
+  font-family: var(--font-pixel);
+  font-size: 0.6rem;
+  color: var(--text-on-dark);
+  line-height: 1.8;
+  word-break: keep-all;
+}
+
+.gb-quote-source {
+  font-family: var(--font-pixel);
+  font-size: 0.4rem;
+  color: var(--accent);
+  margin-top: 8px;
+  text-align: right;
+}
+
+.gb-waveform {
+  margin-bottom: 8px;
+  min-height: 40px;
+}
+
+.gb-timer {
+  font-family: var(--font-pixel);
+  font-size: 0.8rem;
+  color: var(--text-on-dark);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.gb-rec-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: var(--bg-card-hover);
+  border: 2px solid var(--border);
+  color: var(--text-on-dark);
+  font-family: var(--font-pixel);
+  font-size: 0.65rem;
+  padding: 12px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.1s;
+}
+
+.gb-rec-btn:hover {
+  background: var(--border);
+}
+
+.gb-rec-btn.gb-rec-active {
+  border-color: var(--text-on-dark);
+  animation: gb-rec-pulse 1s ease-in-out infinite;
+}
+
+.gb-rec-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-on-dark);
+  flex-shrink: 0;
+}
+
+.gb-rec-btn.gb-rec-active .gb-rec-dot {
+  background: #ff0000;
+  animation: gb-blink 0.5s step-end infinite;
+}
+
+@keyframes gb-rec-pulse {
+  0%, 100% { border-color: var(--text-on-dark); }
+  50% { border-color: var(--accent); }
+}
+
+.gb-status-text {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  color: var(--accent);
+  text-align: center;
+  margin-top: 8px;
+  animation: gb-blink 1s step-end infinite;
+}
+
+
+/* ===== GAME BOY LOBBY SCREEN ===== */
+.gb-screen {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.gb-frame {
+  background: var(--bg-card);
+  border: 4px solid var(--border);
+  padding: 32px 24px;
+  max-width: 360px;
+  width: 100%;
+  image-rendering: pixelated;
+}
+
+.gb-title-block {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.gb-title-line {
+  font-family: var(--font-pixel);
+  font-size: 1.4rem;
+  color: var(--text-on-dark);
+  line-height: 1.6;
+  letter-spacing: 2px;
+}
+
+.gb-subtitle {
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  color: var(--accent);
+  margin-top: 8px;
+  letter-spacing: 1px;
+}
+
+.gb-divider {
+  height: 2px;
+  background: var(--border);
+  margin: 16px 0;
+}
+
+.gb-menu-label {
+  font-family: var(--font-pixel);
+  font-size: 0.55rem;
+  color: var(--accent);
+  text-align: center;
+  margin-bottom: 16px;
+  letter-spacing: 2px;
+}
+
+.gb-mode-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.gb-mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  border: 2px solid var(--border);
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background 0.1s;
+  width: 100%;
+  text-align: left;
+}
+
+.gb-mode-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--text-on-dark);
+}
+
+.gb-mode-icon {
+  font-family: var(--font-pixel);
+  font-size: 0.7rem;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.gb-mode-title {
+  font-family: var(--font-pixel);
+  font-size: 0.75rem;
+  color: var(--text-on-dark);
+  margin-bottom: 4px;
+}
+
+.gb-mode-desc {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  color: var(--accent);
+}
+
+.gb-footer {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  color: var(--accent);
+  text-align: center;
+  letter-spacing: 1px;
+  animation: gb-blink 1s step-end infinite;
+}
+
+@keyframes gb-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ===== GAME BOY RESULT SCREEN ===== */
+.gb-result-frame {
+  max-width: 400px;
+}
+
+.gb-result-title {
+  font-family: var(--font-pixel);
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 16px;
+  letter-spacing: 2px;
+}
+
+.gb-victory {
+  color: var(--text-on-dark);
+  animation: gb-blink 0.8s step-end infinite;
+}
+
+.gb-defeat {
+  color: var(--accent);
+}
+
+.gb-score-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.gb-score-item {
+  text-align: center;
+  flex: 1;
+}
+
+.gb-score-player {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.gb-score-num {
+  font-family: var(--font-pixel);
+  font-size: 1.2rem;
+  color: var(--text-on-dark);
+}
+
+.gb-score-vs {
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  color: var(--accent);
+  padding: 0 8px;
+}
+
+.gb-status-label {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  color: var(--accent);
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.gb-cat-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.gb-cat-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gb-cat-label {
+  font-family: var(--font-pixel);
+  font-size: 0.4rem;
+  color: var(--accent);
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.gb-cat-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.gb-cat-fill {
+  height: 100%;
+  background: var(--text-on-dark);
+  transition: width 0.05s linear;
+}
+
+.gb-cat-value {
+  font-family: var(--font-pixel);
+  font-size: 0.4rem;
+  color: var(--text-on-dark);
+  width: 28px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.gb-rank-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.gb-rank-label {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  color: var(--accent);
+}
+
+.gb-rank-badge {
+  font-family: var(--font-pixel);
+  font-size: 1.5rem;
+  color: var(--text-on-dark);
+  border: 2px solid var(--text-on-dark);
+  padding: 4px 12px;
+}
+
+.gb-result-reason {
+  font-family: var(--font-pixel);
+  font-size: 0.4rem;
+  color: var(--accent);
+  line-height: 1.8;
+  margin-bottom: 16px;
+  word-break: keep-all;
+}
+
+.gb-result-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ===== GAME BOY BATTLE SCREEN ===== */
+.gb-battle-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* ===== GAME BOY KO SCREEN ===== */
+.gb-ko-title {
+  font-family: var(--font-pixel);
+  font-size: 2rem;
+  color: var(--text-on-dark);
+  text-align: center;
+  margin-bottom: 16px;
+  letter-spacing: 4px;
+  animation: gb-blink 0.5s step-end infinite;
+}
+
+/* ===== GAME BOY CHARACTER SELECT ===== */
+.gb-char-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.gb-char-card {
+  background: var(--bg-card-hover);
+  border: 2px solid var(--border);
+  padding: 12px 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.1s;
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-size: 1.5rem;
+}
+
+.gb-char-card:hover:not(:disabled) {
+  background: var(--border);
+  border-color: var(--text-on-dark);
+}
+
+.gb-char-card.selected {
+  border-color: var(--text-on-dark);
+  background: var(--border);
+}
+
+.gb-char-card:disabled,
+.gb-char-card.locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.gb-char-name {
+  font-family: var(--font-pixel);
+  font-size: 0.35rem;
+  color: var(--text-on-dark);
+  margin-top: 4px;
+}
+
+/* ===== GAME BOY WORD SELECT ===== */
+.gb-word-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.gb-word-btn {
+  background: var(--bg-card-hover);
+  border: 2px solid var(--border);
+  color: var(--text-on-dark);
+  font-family: var(--font-pixel);
+  font-size: 0.65rem;
+  padding: 12px 16px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+  width: 100%;
+}
+
+.gb-word-btn:hover {
+  background: var(--border);
+}
+
+.gb-word-btn.selected {
+  border-color: var(--text-on-dark);
+  background: var(--border);
 }

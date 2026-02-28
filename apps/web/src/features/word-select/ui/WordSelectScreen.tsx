@@ -16,6 +16,7 @@ interface WordSelectScreenProps {
   p1Hp?: number;
   p2Hp?: number;
   round?: number;
+  nickname: string;
 }
 
 export default function WordSelectScreen({
@@ -26,9 +27,10 @@ export default function WordSelectScreen({
   onSubmitOnline,
   p1Character,
   p2Character,
-  p1Hp = 100,
-  p2Hp = 100,
+  p1Hp = 3,
+  p2Hp = 3,
   round = 1,
+  nickname,
 }: WordSelectScreenProps) {
   const [step, setStep] = useState<1 | 2>(1);
   const [keyword1, setKeyword1] = useState<string | null>(null);
@@ -73,8 +75,17 @@ export default function WordSelectScreen({
   };
 
   return (
-    <div className="screen">
-      <div className="container">
+    <div className="lobby-container">
+      {/* Retro Header */}
+      <header className="retro-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '1.2rem' }}>🎮</span>
+          <span style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>KUKURU PINGPONG</span>
+        </div>
+        <div className="retro-badge">{nickname || 'PLAYER'}</div>
+      </header>
+
+      <main className="screen" style={{ paddingTop: '80px', flexDirection: 'column', gap: '12px' }}>
         <BattleHud
           p1Character={p1Character ?? null}
           p2Character={p2Character ?? null}
@@ -83,100 +94,82 @@ export default function WordSelectScreen({
           round={round}
         />
 
-        {mode === 'local' ? (
-          <>
-            {step === 1 ? (
-              <>
-                <h2>
-                  <span className="player-label p1">Player 1</span> 키워드 선택
-                </h2>
-                <p className="desc">어떤 작품의 단서일까요? 하나를 골라보세요!</p>
-                <div className="word-chips">
-                  {quote1.keywords.map((w) => (
-                    <button
-                      key={w}
-                      className={`word-chip${keyword1 === w ? ' selected' : ''}`}
-                      onClick={() => setKeyword1(w)}
-                    >
-                      {w}
-                    </button>
-                  ))}
-                </div>
+        <div className="retro-badge-light" style={{ margin: '0 auto' }}>
+          KEYWORD SELECTION
+        </div>
+
+        <h1 style={{ fontSize: '1rem', textAlign: 'center', marginBottom: '8px' }}>
+          {mode === 'local' 
+            ? `PLAYER ${step} TURN` 
+            : `PICK YOUR CLUE`
+          }
+        </h1>
+
+        <div className="retro-frame" style={{ width: '100%', maxWidth: '460px', margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontSize: '0.5rem', marginBottom: '16px', color: 'var(--text-secondary)' }}>
+            CHOOSE A KEYWORD FROM THE WORK.
+          </p>
+          
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
+            {((mode === 'local' ? (step === 1 ? quote1 : quote2) : onlineQuote).keywords).map((w) => {
+              const isSelected = mode === 'local' ? (step === 1 ? keyword1 === w : keyword2 === w) : onlinePick === w;
+              return (
                 <button
-                  className="btn btn-primary btn-large"
-                  onClick={handleNext}
-                  disabled={!keyword1}
-                  style={{ marginTop: 20 }}
+                  key={w}
+                  className={`retro-badge${isSelected ? '' : '-light'}`}
+                  onClick={() => {
+                    if (submitted) return;
+                    if (mode === 'local') {
+                      if (step === 1) setKeyword1(w);
+                      else setKeyword2(w);
+                    } else {
+                      setOnlinePick(w);
+                    }
+                  }}
+                  style={{ 
+                    padding: '8px 12px', 
+                    fontSize: '0.6rem',
+                    cursor: submitted ? 'not-allowed' : 'pointer',
+                    border: isSelected ? '2px solid var(--border)' : '1px solid var(--border)',
+                    boxShadow: isSelected ? '0 0 8px rgba(0,0,0,0.2)' : 'none'
+                  }}
                 >
-                  다음
+                  {w}
                 </button>
-              </>
-            ) : (
-              <>
-                <h2>
-                  <span className="player-label p2">Player 2</span> 키워드 선택
-                </h2>
-                <p className="desc">다른 작품의 단서예요. 하나를 골라보세요!</p>
-                <div className="word-chips">
-                  {quote2.keywords.map((w) => (
-                    <button
-                      key={w}
-                      className={`word-chip${keyword2 === w ? ' selected' : ''}`}
-                      onClick={() => !submitted && setKeyword2(w)}
-                      disabled={submitted}
-                    >
-                      {w}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  className="btn btn-primary btn-large"
-                  onClick={handleSubmit}
-                  disabled={submitted || !keyword2}
-                  style={{ marginTop: 20 }}
-                >
-                  {submitted ? '명대사를 리믹스하는 중...' : '출발!'}
-                </button>
-              </>
-            )}
-          </>
-        ) : (
-          <>
-            <h2>키워드를 선택하세요</h2>
-            <p className="desc">어떤 작품의 단서일까요?</p>
-            <div className="word-group">
-              <span className={`player-label ${playerNum === 1 ? 'p1' : 'p2'}`}>
-                Player {playerNum}
-              </span>
-              <div className="word-chips" style={{ marginTop: 12 }}>
-                {onlineQuote.keywords.map((w) => (
-                  <button
-                    key={w}
-                    className={`word-chip${onlinePick === w ? ' selected' : ''}`}
-                    onClick={() => !submitted && setOnlinePick(w)}
-                    disabled={submitted}
-                  >
-                    {w}
-                  </button>
-                ))}
-              </div>
-              {submitted && (
-                <p className="status-text" style={{ marginTop: 8 }}>
-                  {opponentReady ? '상대방이 키워드를 제출했습니다!' : '상대방을 기다리는 중...'}
-                </p>
-              )}
-            </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={{ width: '100%', maxWidth: '460px', margin: '0 auto', marginTop: '12px' }}>
+          {mode === 'local' ? (
             <button
-              className="btn btn-primary btn-large"
-              onClick={handleSubmit}
-              disabled={submitted || !onlinePick}
-              style={{ marginTop: 16 }}
+              className="retro-button"
+              onClick={step === 1 ? handleNext : handleSubmit}
+              disabled={step === 1 ? !keyword1 : !keyword2 || submitted}
+              style={{ width: '100%' }}
             >
-              {submitted ? '대기 중...' : '출발!'}
+              {step === 1 ? '> NEXT PLAYER' : (submitted ? 'MIXING...' : '> START BATTLE')}
             </button>
-          </>
-        )}
-      </div>
+          ) : (
+            <>
+              <button
+                className="retro-button"
+                onClick={handleSubmit}
+                disabled={submitted || !onlinePick}
+                style={{ width: '100%' }}
+              >
+                {submitted ? 'WAITING...' : '> START BATTLE'}
+              </button>
+              {submitted && (
+                <div style={{ textAlign: 'center', fontSize: '0.45rem', marginTop: '12px', color: 'var(--text-secondary)' }}>
+                  {opponentReady ? 'OPPONENT READY!' : 'WAITING FOR OPPONENT...'}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </main>
     </div>
   );
 }

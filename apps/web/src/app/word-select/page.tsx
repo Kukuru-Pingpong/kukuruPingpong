@@ -15,6 +15,7 @@ export default function WordSelectPage() {
     p1Hp,
     p2Hp,
     round,
+    nickname,
   } = useGame();
 
   return (
@@ -30,6 +31,7 @@ export default function WordSelectPage() {
         p1Hp={p1Hp}
         p2Hp={p2Hp}
         round={round}
+        nickname={nickname}
       />
     </div>
   );

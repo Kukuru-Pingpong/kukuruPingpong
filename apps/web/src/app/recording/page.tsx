@@ -12,6 +12,9 @@ export default function RecordingPage() {
     handleRecordingDone,
     p1Character,
     p2Character,
+    p1Hp,
+    p2Hp,
+    round,
   } = useGame();
 
   return (
@@ -24,6 +27,9 @@ export default function RecordingPage() {
         onRecordingDone={handleRecordingDone}
         p1Character={p1Character}
         p2Character={p2Character}
+        p1Hp={p1Hp}
+        p2Hp={p2Hp}
+        round={round}
       />
     </div>
   );

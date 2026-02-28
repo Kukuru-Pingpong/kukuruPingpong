@@ -4,7 +4,7 @@ import { OnlineLobbyScreen } from '@/features/online-lobby';
 import { useGame } from '@/contexts/GameContext';
 
 export default function OnlineLobbyPage() {
-  const { resetGame, handleCreateRoom, handleJoinRoom } = useGame();
+  const { resetGame, handleCreateRoom, handleJoinRoom, nickname } = useGame();
 
   return (
     <div className="app">
@@ -12,6 +12,7 @@ export default function OnlineLobbyPage() {
         onBack={resetGame}
         onCreateRoom={handleCreateRoom}
         onJoinRoom={handleJoinRoom}
+        nickname={nickname}
       />
     </div>
   );

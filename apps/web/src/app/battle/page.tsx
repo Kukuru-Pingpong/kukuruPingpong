@@ -17,6 +17,7 @@ export default function BattlePage() {
     playerNum,
     recordings,
     sentence,
+    nickname,
   } = useGame();
 
   return (
@@ -33,6 +34,7 @@ export default function BattlePage() {
       playerNum={playerNum}
       recordings={recordings}
       sentence={sentence}
+      nickname={nickname}
     />
   );
 }

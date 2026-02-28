@@ -1,7 +1,6 @@
 'use client';
 
 import type { Character } from '@/entities/character';
-import { CharacterAvatar } from '@/widgets/character-avatar';
 
 interface BattleHudProps {
   p1Character: Character | null;
@@ -11,47 +10,51 @@ interface BattleHudProps {
   round: number;
 }
 
-function hpBarClass(hp: number, player: 'p1' | 'p2') {
-  let cls = `hp-bar ${player}`;
-  if (hp <= 20) cls += ' critical';
-  else if (hp <= 40) cls += ' low';
-  return cls;
-}
-
 export default function BattleHud({ p1Character, p2Character, p1Hp, p2Hp, round }: BattleHudProps) {
   if (!p1Character || !p2Character) return null;
 
+  const renderHearts = (hp: number) => {
+    return Array.from({ length: 3 }, (_, i) => (
+      <span key={i} style={{ fontSize: '1.2rem', color: i < hp ? 'var(--text-light)' : 'rgba(255, 255, 255, 0.2)' }}>
+        {i < hp ? '♥' : '♡'}
+      </span>
+    ));
+  };
+
   return (
-    <div className="battle-hud">
-      <div className="hud-player">
-        <div className="hud-info">
-          <span className="hud-emoji">
-            <CharacterAvatar image={p1Character.image} emoji={p1Character.emoji} size={28} className="" />
-          </span>
-          <span className="hud-name" style={{ color: 'var(--p1-color)' }}>{p1Character.name}</span>
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      color: 'var(--text-light)',
+      background: 'var(--bg-card)',
+      padding: '8px 16px',
+      border: '4px solid var(--border)',
+      boxShadow: '4px 4px 0px 0px var(--border)',
+      marginBottom: '20px',
+      width: '100%',
+      maxWidth: '460px',
+      margin: '0 auto 20px'
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span style={{ fontSize: '1.5rem' }}>{p1Character.emoji}</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <span style={{ fontSize: '0.45rem' }}>P1: {p1Character.name}</span>
+          <div style={{ display: 'flex', gap: '2px' }}>{renderHearts(p1Hp)}</div>
         </div>
-        <div className="hp-bar-container">
-          <div className={hpBarClass(p1Hp, 'p1')} style={{ width: `${p1Hp}%` }} />
-        </div>
-        <span className="hud-hp-text">{p1Hp}/100</span>
+      </div>
+      
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: '0.4rem', opacity: 0.6 }}>RND</div>
+        <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{round}</div>
       </div>
 
-      <div className="hud-round">
-        <span className="round-label">Round</span>
-        <span className="round-number">{round}</span>
-      </div>
-
-      <div className="hud-player right">
-        <div className="hud-info">
-          <span className="hud-name" style={{ color: 'var(--p2-color)' }}>{p2Character.name}</span>
-          <span className="hud-emoji">
-            <CharacterAvatar image={p2Character.image} emoji={p2Character.emoji} size={28} className="" />
-          </span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', textAlign: 'right' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'flex-end' }}>
+          <span style={{ fontSize: '0.45rem' }}>P2: {p2Character.name}</span>
+          <div style={{ display: 'flex', gap: '2px' }}>{renderHearts(p2Hp)}</div>
         </div>
-        <div className="hp-bar-container">
-          <div className={hpBarClass(p2Hp, 'p2')} style={{ width: `${p2Hp}%` }} />
-        </div>
-        <span className="hud-hp-text">{p2Hp}/100</span>
+        <span style={{ fontSize: '1.5rem' }}>{p2Character.emoji}</span>
       </div>
     </div>
   );
