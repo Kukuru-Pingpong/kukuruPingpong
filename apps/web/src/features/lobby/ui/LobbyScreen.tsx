@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+
 interface LobbyScreenProps {
   onLocal: () => void;
   onOnline: () => void;
@@ -13,6 +15,28 @@ export default function LobbyScreen({
   nickname,
   onReset,
 }: LobbyScreenProps) {
+  const bgmRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const audio = new Audio('/audio/theme.mp3');
+    audio.loop = true;
+    audio.volume = 0.3;
+    bgmRef.current = audio;
+
+    audio.play().catch(() => {
+      const handleClick = () => {
+        audio.play().catch(() => {});
+        document.removeEventListener('click', handleClick);
+      };
+      document.addEventListener('click', handleClick);
+    });
+
+    return () => {
+      audio.pause();
+      audio.src = '';
+    };
+  }, []);
+
   return (
     <div className="lobby">
       {/* Header */}
@@ -54,7 +78,6 @@ export default function LobbyScreen({
                 alt="VS CPU"
                 className="lobby-card-thumb-img"
               />
-              <div className="lobby-card-icon">🤖</div>
             </div>
             <div className="lobby-card-body">
               <h2 className="lobby-card-title">VS CPU</h2>
@@ -82,7 +105,6 @@ export default function LobbyScreen({
                 alt="VS HUMAN"
                 className="lobby-card-thumb-img"
               />
-              <div className="lobby-card-icon">⚔️</div>
             </div>
             <div className="lobby-card-body">
               <h2 className="lobby-card-title">VS HUMAN</h2>
@@ -100,7 +122,7 @@ export default function LobbyScreen({
         {/* Footer */}
         <footer className="lobby-footer">
           <span>■ ONLINE</span>
-          <span>👤 1248 PLYRS</span>
+          <span>1248 PLYRS</span>
           <span>VER 1.0.4</span>
         </footer>
       </main>

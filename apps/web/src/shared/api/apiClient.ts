@@ -71,3 +71,20 @@ export async function requestJudgment(
   if (data.error) throw new Error(data.error);
   return data;
 }
+
+export async function requestLocalBattle(
+  playerAudio: Blob,
+  quoteId: number,
+): Promise<Judgment> {
+  const formData = new FormData();
+  formData.append('playerAudio', playerAudio, 'player.webm');
+  formData.append('quoteId', String(quoteId));
+
+  const res = await fetch(`${API_BASE}/local-battle`, {
+    method: 'POST',
+    body: formData,
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}

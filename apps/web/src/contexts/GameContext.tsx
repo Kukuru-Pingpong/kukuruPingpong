@@ -14,11 +14,12 @@ import {
   generateSentence,
   generateTts,
   requestJudgment,
+  requestLocalBattle,
   type Judgment,
 } from '@/shared/api';
 import { blobToBase64, base64ToBlob, cleanupAudio } from '@/shared/audio';
 import { getSocket, disconnectSocket } from '@/shared/socket';
-import { getRandomQuote } from '@/entities/quote';
+import { getRandomQuote, type Quote } from '@/entities/quote';
 import { type Character, STARTING_HP, calculateDamage, getCharacterById } from '@/entities/character';
 import type { Socket } from 'socket.io-client';
 
@@ -71,7 +72,7 @@ interface GameContextType {
   handleSelectCharacter: (character: Character, player: 1 | 2) => void;
   handleBattleComplete: () => void;
   handleOnlineQuoteReady: (quote: { text: string; source: string }) => void;
-  handleWordSelectRecordDone: (blob: Blob, quote: { text: string; source: string }) => Promise<void>;
+  handleWordSelectRecordDone: (blob: Blob, quote: Quote) => Promise<void>;
 }
 
 const GameContext = createContext<GameContextType | null>(null);
@@ -163,7 +164,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
     socketRef.current = socket;
 
     socket.on('game-start', () => {
-      router.push('/character-select');
+      const savedCharId = Number(localStorage.getItem('kukuru_char') || '1');
+      const myChar = getCharacterById(savedCharId) || getCharacterById(1);
+      if (myChar) {
+        socket.emit('select-character', { characterId: myChar.id });
+      }
     });
 
     socket.on('both-characters-selected', ({ char1, char2 }: { char1: number; char2: number }) => {
@@ -210,9 +215,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         1: base64ToBlob(audio1),
         2: base64ToBlob(audio2),
       });
-      // Go to battle instead of listen
       if (playerNumRef.current === 1) {
-        // P1 auto-judges
         setLoading('AI 심판이 판정 중...');
       }
       router.push('/battle');
@@ -303,11 +306,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
         setP1Character(character);
       } else {
         setP2Character(character);
-        // Both selected, go to word select
         router.push('/word-select');
       }
     } else {
-      // Online: emit selection
       if (player === 1) setP1Character(character);
       else setP2Character(character);
       socketRef.current?.emit('select-character', { characterId: character.id });
@@ -336,7 +337,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
           const ttsBlob = await generateTts(sentence);
           setRecordings((prev) => ({ ...prev, 2: ttsBlob }));
           setLoading('');
-          // 배틀 화면으로 먼저 이동 (판정은 배틀 화면에서 진행)
           router.push('/battle');
         } catch (err: any) {
           setLoading('');
@@ -382,21 +382,21 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   // Word-select recording done: handles combined quote + recording flow
   const handleWordSelectRecordDone = useCallback(
-    async (blob: Blob, quote: { text: string; source: string }) => {
+    async (blob: Blob, quote: Quote) => {
       setSentence(quote.text);
-      setQuoteSource(quote.source);
+      setQuoteSource(quote.movie);
 
       if (mode === 'local') {
         setRecordings((prev) => ({ ...prev, 1: blob }));
-        setLoading('AI가 문장을 읽는 중...');
+        setLoading('AI 심판이 판정 중...');
         try {
-          const ttsBlob = await generateTts(quote.text);
-          setRecordings((prev) => ({ ...prev, 2: ttsBlob }));
+          const j = await requestLocalBattle(blob, quote.id);
+          setJudgment(j);
           setLoading('');
           router.push('/battle');
         } catch (err: any) {
           setLoading('');
-          alert('AI 음성 생성 실패: ' + err.message);
+          alert('판정 실패: ' + err.message);
         }
       } else {
         // Online mode - send recording via socket
@@ -456,7 +456,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setIsKo(true);
       setKoLoser(loser);
       setTimeout(() => {
-        router.push('/ko');
+        router.push('/victory');
       }, 500);
 
       if (mode === 'online' && playerNumRef.current === 1) {

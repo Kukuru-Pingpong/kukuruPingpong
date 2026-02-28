@@ -4,13 +4,17 @@ import {
   Body,
   Res,
   UploadedFiles,
+  UploadedFile,
   UseInterceptors,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { AiService } from '../../application/services/ai.service';
+import { getQuoteById } from '../../../game/domain/data/quotes';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Controller('api')
 export class AiController {
@@ -126,6 +130,46 @@ export class AiController {
       return judgment;
     } catch (err) {
       console.error('[judge] 에러:', err);
+      throw new HttpException(
+        { error: '판정 실패: ' + (err?.message || err) },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('local-battle')
+  @UseInterceptors(FileInterceptor('playerAudio'))
+  async localBattle(
+    @UploadedFile() playerAudio: Express.Multer.File,
+    @Body() body: { quoteId: string },
+  ) {
+    const quoteId = parseInt(body.quoteId, 10);
+    if (!playerAudio || isNaN(quoteId)) {
+      throw new HttpException('플레이어 오디오와 quoteId가 필요합니다.', HttpStatus.BAD_REQUEST);
+    }
+
+    const quote = getQuoteById(quoteId);
+    if (!quote) {
+      throw new HttpException('유효하지 않은 quoteId입니다.', HttpStatus.BAD_REQUEST);
+    }
+
+    try {
+      // Load original audio from assets
+      const audioPath = path.join(process.cwd(), 'assets', 'audio', quote.audio);
+      const originalBuffer = fs.readFileSync(audioPath);
+
+      console.log('[local-battle]', { quoteId, quote: quote.text, audioPath });
+
+      const judgment = await this.aiService.judgeLocalBattle(
+        originalBuffer,
+        'audio/mp4',
+        playerAudio.buffer,
+        playerAudio.mimetype,
+        quote.text,
+      );
+      return judgment;
+    } catch (err) {
+      console.error('[local-battle] 에러:', err);
       throw new HttpException(
         { error: '판정 실패: ' + (err?.message || err) },
         HttpStatus.INTERNAL_SERVER_ERROR,

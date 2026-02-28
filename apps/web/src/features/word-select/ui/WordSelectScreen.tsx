@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { quotes } from '@/entities/quote';
+import { useState, useEffect, useRef } from 'react';
+import { quotes, type Quote } from '@/entities/quote';
 import { type Character } from '@/entities/character';
 import { BattleHud } from '@/widgets/battle-hud';
 import {
@@ -18,10 +18,7 @@ interface WordSelectScreenProps {
   sentence?: string;
   loading?: string;
   onQuoteReady?: (quote: { text: string; source: string }) => void;
-  onRecordingComplete: (
-    blob: Blob,
-    quote: { text: string; source: string },
-  ) => void;
+  onRecordingComplete: (blob: Blob, quote: Quote) => void;
   p1Character?: Character | null;
   p2Character?: Character | null;
   p1Hp?: number;
@@ -30,7 +27,13 @@ interface WordSelectScreenProps {
   nickname: string;
 }
 
-type Phase = 'waiting' | 'ready' | 'countdown' | 'recording' | 'done';
+type Phase =
+  | 'waiting'
+  | 'ready'
+  | 'playing-audio'
+  | 'countdown'
+  | 'recording'
+  | 'done';
 
 export default function WordSelectScreen({
   mode,
@@ -52,6 +55,7 @@ export default function WordSelectScreen({
   const [stream, setStream] = useState<MediaStream | null>(null);
   const completedRef = useRef(false);
   const recordingStartedRef = useRef(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [quote] = useState(() => {
     return quotes[Math.floor(Math.random() * quotes.length)];
@@ -60,7 +64,6 @@ export default function WordSelectScreen({
   // Determine the displayed quote text
   const isOnlineP2 = mode === 'online' && playerNum === 2;
   const displayText = isOnlineP2 ? externalSentence || '' : quote.text;
-  const displaySource = isOnlineP2 ? '' : quote.source;
 
   // Request mic permission early
   useEffect(() => {
@@ -80,7 +83,7 @@ export default function WordSelectScreen({
     } else {
       // Local or Online P1: emit quote and start
       if (mode === 'online' && playerNum === 1) {
-        onQuoteReady?.({ text: quote.text, source: quote.source });
+        onQuoteReady?.({ text: quote.text, source: quote.movie });
       }
       const t = setTimeout(() => setPhase('ready'), 500);
       return () => clearTimeout(t);
@@ -95,12 +98,37 @@ export default function WordSelectScreen({
     onQuoteReady,
   ]);
 
-  // Phase: ready → countdown (after 1s showing the quote)
+  // Phase: ready → playing-audio (after showing quote info)
   useEffect(() => {
     if (phase !== 'ready') return;
-    const t = setTimeout(() => setPhase('countdown'), 2000);
+    const t = setTimeout(() => setPhase('playing-audio'), 2000);
     return () => clearTimeout(t);
   }, [phase]);
+
+  // Phase: playing-audio → play original audio, then countdown
+  useEffect(() => {
+    if (phase !== 'playing-audio') return;
+
+    const audio = new Audio(`/audio/${quote.audio}`);
+    audioRef.current = audio;
+
+    audio.onended = () => {
+      setPhase('countdown');
+    };
+
+    audio.onerror = () => {
+      setPhase('countdown');
+    };
+
+    audio.play().catch(() => {
+      setPhase('countdown');
+    });
+
+    return () => {
+      audio.pause();
+      audio.src = '';
+    };
+  }, [phase, quote.audio]);
 
   // Phase: countdown 3...2...1
   useEffect(() => {
@@ -136,10 +164,7 @@ export default function WordSelectScreen({
           if (blob && !completedRef.current) {
             completedRef.current = true;
             setPhase('done');
-            const q = isOnlineP2
-              ? { text: externalSentence || '', source: '' }
-              : { text: quote.text, source: quote.source };
-            onRecordingComplete(blob, q);
+            onRecordingComplete(blob, quote);
           }
         }, 5000);
       } catch (err: any) {
@@ -152,7 +177,7 @@ export default function WordSelectScreen({
     return () => {
       stopped = true;
     };
-  }, [phase, quote, externalSentence, isOnlineP2, onRecordingComplete]);
+  }, [phase, quote, onRecordingComplete]);
 
   return (
     <div className="lobby-container">
@@ -200,12 +225,27 @@ export default function WordSelectScreen({
             textAlign: 'center',
           }}
         >
-          {displaySource && (
+          {!isOnlineP2 && (
             <div
-              className="retro-badge-light"
-              style={{ fontSize: '0.4rem', margin: '0 auto' }}
+              style={{
+                display: 'flex',
+                gap: '6px',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+              }}
             >
-              {displaySource}
+              <div
+                className="retro-badge-light"
+                style={{ fontSize: '0.35rem', margin: 0 }}
+              >
+                {quote.movie}
+              </div>
+              <div
+                className="retro-badge-light"
+                style={{ fontSize: '0.35rem', margin: 0 }}
+              >
+                {quote.actor} ({quote.character})
+              </div>
             </div>
           )}
           <div
@@ -250,7 +290,30 @@ export default function WordSelectScreen({
               color: 'var(--text-secondary)',
             }}
           >
-            이 명대사를 읽어주세요!
+            원본 음성을 들려드릴게요!
+          </div>
+        )}
+
+        {/* Phase: Playing original audio */}
+        {phase === 'playing-audio' && (
+          <div style={{ textAlign: 'center' }}>
+            <div
+              style={{
+                fontSize: '1.5rem',
+                animation: 'gb-blink 0.5s step-end infinite',
+              }}
+            >
+              🔊
+            </div>
+            <div
+              style={{
+                fontSize: '0.5rem',
+                color: 'var(--text-secondary)',
+                marginTop: '8px',
+              }}
+            >
+              원본 음성을 듣고 따라해 보세요!
+            </div>
           </div>
         )}
 

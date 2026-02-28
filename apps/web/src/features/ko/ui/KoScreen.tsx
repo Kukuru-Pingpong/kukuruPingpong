@@ -53,10 +53,10 @@ export default function KoScreen({
         <div style={{ position: 'fixed', inset: 0, background: '#fff', zIndex: 2001, animation: 'koFlash 0.9s forwards' }} />
       )}
 
-      <main className="screen" style={{ flexDirection: 'column', gap: '40px', justifyContent: 'center' }}>
+      <main className="screen" style={{ flexDirection: 'column', gap: '40px', justifyContent: 'center', alignItems: 'center' }}>
         {(phase === 'ko-text' || phase === 'characters' || phase === 'info') && (
           <h1 className={shaking ? 'ko-shake' : ''} style={{ 
-            fontSize: '5rem', 
+            fontSize: '10rem',
             color: '#ff0000', 
             textAlign: 'center',
             letterSpacing: '8px',
@@ -96,8 +96,8 @@ export default function KoScreen({
         )}
 
         {phase === 'info' && (
-          <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div className="retro-badge-light" style={{ padding: '8px 16px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px', width: '100%' }}>
+            <div className="retro-badge-light" style={{ padding: '8px 16px' }}>
               FINISHED IN {round} ROUNDS
             </div>
             <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>

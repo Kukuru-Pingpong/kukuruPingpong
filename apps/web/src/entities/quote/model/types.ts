@@ -1,7 +1,8 @@
 export interface Quote {
   id: number;
   text: string;
-  source: string;
-  keywords: string[];
-  category: 'movie' | 'drama';
+  actor: string;
+  character: string;
+  movie: string;
+  audio: string;
 }

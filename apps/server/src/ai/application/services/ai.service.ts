@@ -45,4 +45,14 @@ export class AiService {
   ): Promise<JudgmentResult> {
     return this.voiceJudge.judgeVoices(audio1Buffer, audio1MimeType, audio2Buffer, audio2MimeType, sentence);
   }
+
+  async judgeLocalBattle(
+    originalBuffer: Buffer,
+    originalMimeType: string,
+    playerBuffer: Buffer,
+    playerMimeType: string,
+    sentence: string,
+  ): Promise<JudgmentResult> {
+    return this.voiceJudge.judgeVoices(originalBuffer, originalMimeType, playerBuffer, playerMimeType, sentence);
+  }
 }
