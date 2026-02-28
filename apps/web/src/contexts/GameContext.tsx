@@ -245,7 +245,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setMode('local');
     setRecordings({ 1: null, 2: null });
     setCurrentPlayer(1);
-    setP1Character(null);
+    const savedCharId = Number(localStorage.getItem('kukuru_char') || '1');
+    const myChar = getCharacterById(savedCharId) || getCharacterById(1);
+    setP1Character(myChar || null);
     setP2Character(null);
     setP1Hp(STARTING_HP);
     setP2Hp(STARTING_HP);

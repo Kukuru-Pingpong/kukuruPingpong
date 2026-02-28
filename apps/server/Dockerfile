@@ -18,6 +18,7 @@ WORKDIR /app
 COPY --from=build /app/apps/server/dist ./dist
 COPY --from=build /app/apps/server/package.json ./
 COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/apps/server/assets ./assets
 
 ENV NODE_ENV=production
 ENV PORT=8080

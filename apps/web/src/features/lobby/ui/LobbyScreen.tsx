@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-
 interface LobbyScreenProps {
   onLocal: () => void;
   onOnline: () => void;
@@ -15,28 +13,6 @@ export default function LobbyScreen({
   nickname,
   onReset,
 }: LobbyScreenProps) {
-  const bgmRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    const audio = new Audio('/audio/theme.mp3');
-    audio.loop = true;
-    audio.volume = 0.3;
-    bgmRef.current = audio;
-
-    audio.play().catch(() => {
-      const handleClick = () => {
-        audio.play().catch(() => {});
-        document.removeEventListener('click', handleClick);
-      };
-      document.addEventListener('click', handleClick);
-    });
-
-    return () => {
-      audio.pause();
-      audio.src = '';
-    };
-  }, []);
-
   return (
     <div className="lobby">
       {/* Header */}
