@@ -21,6 +21,7 @@ interface BattleScreenProps {
   sentence?: string;
   nickname: string;
   lastWinner?: 1 | 2 | null;
+  onGoHome: () => void;
 }
 
 type Phase =
@@ -47,6 +48,7 @@ export default function BattleScreen({
   sentence,
   nickname,
   lastWinner,
+  onGoHome,
 }: BattleScreenProps) {
   const [phase, setPhase] = useState<Phase>('enter');
   const [displayP1Score, setDisplayP1Score] = useState(0);
@@ -204,13 +206,18 @@ export default function BattleScreen({
   if (!judgment) {
     return (
       <div className="lobby-container">
-        <header className="retro-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>
-              KUKURU PINGPONG
-            </span>
+        <header className="lobby-header">
+          <div className="lobby-header-left">
+            <span className="lobby-header-title">KUKURU PINGPONG</span>
           </div>
-          <div className="retro-badge">{nickname || 'PLAYER'}</div>
+          <div className="lobby-header-right">
+            <div className="lobby-nickname-badge">
+              nickname: {nickname || 'PLAYER'}
+            </div>
+            <button className="lobby-reset-btn" onClick={onGoHome}>
+              Go To Home
+            </button>
+          </div>
         </header>
 
         <main
@@ -313,13 +320,18 @@ export default function BattleScreen({
 
   return (
     <div className="lobby-container">
-      <header className="retro-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>
-            KUKURU PINGPONG
-          </span>
+      <header className="lobby-header">
+        <div className="lobby-header-left">
+          <span className="lobby-header-title">KUKURU PINGPONG</span>
         </div>
-        <div className="retro-badge">{nickname || 'PLAYER'}</div>
+        <div className="lobby-header-right">
+          <div className="lobby-nickname-badge">
+            nickname: {nickname || 'PLAYER'}
+          </div>
+          <button className="lobby-reset-btn" onClick={onGoHome}>
+            Go To Home
+          </button>
+        </div>
       </header>
 
       <main

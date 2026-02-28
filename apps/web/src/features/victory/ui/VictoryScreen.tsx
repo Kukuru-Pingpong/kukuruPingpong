@@ -11,6 +11,8 @@ interface VictoryScreenProps {
   round: number;
   judgment: Judgment | null;
   onRematch: () => void;
+  nickname: string;
+  onGoHome: () => void;
 }
 
 function getRank(score: number): string {
@@ -30,6 +32,8 @@ export default function VictoryScreen({
   round,
   judgment,
   onRematch,
+  nickname,
+  onGoHome,
 }: VictoryScreenProps) {
   const [phase, setPhase] = useState<VictoryPhase>('banner');
 
@@ -65,9 +69,17 @@ export default function VictoryScreen({
 
   return (
     <div className="lobby-container" style={{ background: 'var(--bg-main)', minHeight: '100vh' }}>
-      <header className="retro-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>KUKURU PINGPONG</span>
+      <header className="lobby-header">
+        <div className="lobby-header-left">
+          <span className="lobby-header-title">KUKURU PINGPONG</span>
+        </div>
+        <div className="lobby-header-right">
+          <div className="lobby-nickname-badge">
+            nickname: {nickname || 'PLAYER'}
+          </div>
+          <button className="lobby-reset-btn" onClick={onGoHome}>
+            Go To Home
+          </button>
         </div>
       </header>
 

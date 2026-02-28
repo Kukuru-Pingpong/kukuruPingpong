@@ -4,7 +4,7 @@ import { useGame } from '@/contexts/GameContext';
 import { CharacterSelectScreen } from '@/features/character-select';
 
 export default function CharacterSelectPage() {
-  const { mode, playerNum, p1Character, handleSelectCharacter, nickname } = useGame();
+  const { mode, playerNum, p1Character, handleSelectCharacter, nickname, goHome } = useGame();
   return (
     <CharacterSelectScreen
       mode={mode}
@@ -12,6 +12,7 @@ export default function CharacterSelectPage() {
       p1Character={p1Character}
       onSelect={handleSelectCharacter}
       nickname={nickname}
+      onGoHome={goHome}
     />
   );
 }

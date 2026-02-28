@@ -60,6 +60,7 @@ interface GameContextType {
   setNickname: (name: string) => void;
 
   resetGame: () => void;
+  goHome: () => void;
   setupSocket: () => Socket;
   handleLocal: () => void;
   handleOnline: () => void;
@@ -158,6 +159,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
     cleanupAudio();
     router.push('/');
   }, [router]);
+
+  const goHome = useCallback(() => {
+    resetGame();
+    localStorage.removeItem('kukuru_nickname');
+    setNickname('');
+  }, [resetGame]);
 
   const setupSocket = useCallback(() => {
     const socket = getSocket();
@@ -528,6 +535,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setNickname,
 
     resetGame,
+    goHome,
     setupSocket,
     handleLocal,
     handleOnline,

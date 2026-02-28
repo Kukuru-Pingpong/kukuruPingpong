@@ -10,6 +10,7 @@ interface CharacterSelectScreenProps {
   p1Character: Character | null;
   onSelect: (character: Character, player: 1 | 2) => void;
   nickname: string;
+  onGoHome: () => void;
 }
 
 export default function CharacterSelectScreen({
@@ -18,6 +19,7 @@ export default function CharacterSelectScreen({
   p1Character,
   onSelect,
   nickname,
+  onGoHome,
 }: CharacterSelectScreenProps) {
   const [selected, setSelected] = useState<Character | null>(null);
   const [cpuSelecting, setCpuSelecting] = useState(false);
@@ -78,14 +80,19 @@ export default function CharacterSelectScreen({
 
   return (
     <div className="lobby-container">
-      {/* Retro Header */}
-      <header className="retro-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>
-            KUKURU PINGPONG
-          </span>
+      {/* Header */}
+      <header className="lobby-header">
+        <div className="lobby-header-left">
+          <span className="lobby-header-title">KUKURU PINGPONG</span>
         </div>
-        <div className="retro-badge">{nickname || 'PLAYER'}</div>
+        <div className="lobby-header-right">
+          <div className="lobby-nickname-badge">
+            nickname: {nickname || 'PLAYER'}
+          </div>
+          <button className="lobby-reset-btn" onClick={onGoHome}>
+            Go To Home
+          </button>
+        </div>
       </header>
 
       <main

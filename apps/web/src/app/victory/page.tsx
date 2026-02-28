@@ -4,7 +4,7 @@ import { useGame } from '@/contexts/GameContext';
 import { VictoryScreen } from '@/features/victory';
 
 export default function VictoryPage() {
-  const { p1Character, p2Character, koLoser, round, judgment, resetGame } = useGame();
+  const { p1Character, p2Character, koLoser, round, judgment, resetGame, goHome, nickname } = useGame();
 
   return (
     <VictoryScreen
@@ -14,6 +14,8 @@ export default function VictoryPage() {
       round={round}
       judgment={judgment}
       onRematch={resetGame}
+      nickname={nickname}
+      onGoHome={goHome}
     />
   );
 }

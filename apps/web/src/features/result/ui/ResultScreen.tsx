@@ -11,6 +11,7 @@ interface ResultScreenProps {
   p1Character?: Character | null;
   p2Character?: Character | null;
   nickname?: string;
+  onGoHome: () => void;
 }
 
 function getRank(score: number): string {
@@ -115,6 +116,7 @@ export default function ResultScreen({
   p1Character,
   p2Character,
   nickname,
+  onGoHome,
 }: ResultScreenProps) {
   const isWinner = judgment.winner === 1;
   const p1Total = judgment.player1_total ?? 0;
@@ -130,16 +132,18 @@ export default function ResultScreen({
 
   return (
     <div className="lobby-container">
-      {/* Retro Header */}
-      <header className="retro-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>
-            KUKURU PINGPONG
-          </span>
+      {/* Header */}
+      <header className="lobby-header">
+        <div className="lobby-header-left">
+          <span className="lobby-header-title">KUKURU PINGPONG</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div className="retro-badge">{nickname || 'PLAYER'}</div>
-          <span style={{ cursor: 'pointer' }}>⚙️</span>
+        <div className="lobby-header-right">
+          <div className="lobby-nickname-badge">
+            nickname: {nickname || 'PLAYER'}
+          </div>
+          <button className="lobby-reset-btn" onClick={onGoHome}>
+            Go To Home
+          </button>
         </div>
       </header>
 
