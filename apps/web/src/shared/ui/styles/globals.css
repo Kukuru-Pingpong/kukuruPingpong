@@ -2245,6 +2245,14 @@ h2 {
   box-shadow: 4px 4px 0px 0px var(--border);
   display: flex;
   flex-direction: column;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  cursor: pointer;
+}
+
+.lobby-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 4px 8px 0px 0px var(--border);
+  border-color: var(--text-primary);
 }
 
 .lobby-card-thumb {
