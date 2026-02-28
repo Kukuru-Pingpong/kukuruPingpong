@@ -2130,3 +2130,233 @@ h2 {
   border-color: var(--text-on-dark);
   background: var(--border);
 }
+
+/* ===== TITLE SCREEN ===== */
+.title-screen {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #8bac6d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.title-band {
+  width: 100%;
+  background: #d4e8b2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+  margin-bottom: 40px;
+}
+
+.title-text {
+  font-family: var(--font-pixel);
+  font-size: 2rem;
+  color: #1a2e1a;
+  letter-spacing: 0.15em;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.title-press {
+  font-family: var(--font-pixel);
+  font-size: 0.7rem;
+  color: #1a2e1a;
+  letter-spacing: 0.08em;
+  animation: blink 1.2s step-end infinite;
+}
+
+@media (max-width: 500px) {
+  .title-text {
+    font-size: 1.3rem;
+  }
+  .title-press {
+    font-size: 0.55rem;
+  }
+}
+
+/* ===== CHARACTER SELECT (INITIAL) ===== */
+.cs-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 20px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.cs-title {
+  font-family: var(--font-pixel);
+  font-size: 1.1rem;
+  color: #1a2e1a;
+  letter-spacing: 0.1em;
+}
+
+.cs-grid {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  justify-content: center;
+}
+
+.cs-card {
+  flex: 1;
+  max-width: 200px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 4px solid transparent;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.cs-card:hover {
+  transform: translateY(-4px);
+}
+
+.cs-card-selected {
+  border-color: #1a2e1a;
+  background: rgba(26, 46, 26, 0.1);
+}
+
+.cs-portrait {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 3px solid #1a2e1a;
+  box-shadow: 4px 4px 0px 0px #1a2e1a;
+  background: #2d5a3d;
+}
+
+.cs-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.cs-name {
+  font-family: var(--font-pixel);
+  font-size: 0.7rem;
+  color: #1a2e1a;
+  letter-spacing: 0.1em;
+}
+
+.cs-confirm {
+  margin-top: 8px;
+  min-width: 160px;
+}
+
+.cs-confirm:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ===== NICKNAME POPUP ===== */
+.np-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 56, 15, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.np-popup {
+  background: #d4e8b2;
+  border: 4px solid #1a2e1a;
+  box-shadow: 6px 6px 0px 0px #1a2e1a;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 0 20px 0;
+}
+
+.np-preview {
+  width: 100%;
+  height: 160px;
+  background: #4a6a4a;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 4px solid #1a2e1a;
+}
+
+.np-preview-img {
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.np-title {
+  font-family: var(--font-pixel);
+  font-size: 1rem;
+  color: #1a2e1a;
+  letter-spacing: 0.1em;
+  margin: 16px 0 12px 0;
+}
+
+.np-info {
+  border-left: 3px solid #1a2e1a;
+  padding: 8px 12px;
+  margin: 0 20px 12px 20px;
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  line-height: 1.8;
+  color: #2d5a3d;
+}
+
+.np-error {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  color: #a03030;
+  margin-bottom: 8px;
+}
+
+.np-input {
+  width: calc(100% - 40px);
+  margin: 0 20px;
+  padding: 10px 12px;
+  font-family: var(--font-pixel);
+  font-size: 0.7rem;
+  color: #1a2e1a;
+  background: #eaf4d8;
+  border: 3px solid #1a2e1a;
+  outline: none;
+  letter-spacing: 0.2em;
+  text-align: center;
+}
+
+.np-input::placeholder {
+  color: #8bac6d;
+  letter-spacing: 0.3em;
+}
+
+.np-input:focus {
+  box-shadow: 0 0 0 2px #8bac6d;
+}
+
+.np-btn {
+  margin-top: 16px;
+  min-width: 140px;
+}
+
+.np-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

@@ -21,11 +21,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
           rel="stylesheet"
         />
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff"
-        />
-        <style>{`
+<style>{`
           @font-face {
             font-family: 'DungGeunMo';
             src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff');
