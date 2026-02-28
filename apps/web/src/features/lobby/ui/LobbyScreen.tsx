@@ -33,7 +33,6 @@ export default function LobbyScreen({ onLocal, onOnline, nickname }: LobbyScreen
           <div className="lobby-card">
             <div className="lobby-card-thumb">
               <img src="/characters/cpu.png" alt="VS CPU" className="lobby-card-thumb-img" />
-              <div className="lobby-card-icon">🤖</div>
             </div>
             <div className="lobby-card-body">
               <h2 className="lobby-card-title">VS CPU</h2>
@@ -51,7 +50,6 @@ export default function LobbyScreen({ onLocal, onOnline, nickname }: LobbyScreen
           <div className="lobby-card">
             <div className="lobby-card-thumb">
               <img src="/characters/human.png" alt="VS HUMAN" className="lobby-card-thumb-img" />
-              <div className="lobby-card-icon">⚔️</div>
             </div>
             <div className="lobby-card-body">
               <h2 className="lobby-card-title">VS HUMAN</h2>
