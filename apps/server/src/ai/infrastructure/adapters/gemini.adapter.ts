@@ -52,7 +52,7 @@ export class GeminiAdapter implements ISentenceGenerator, IVoiceJudge, ITextToSp
     const apiKey = this.config.get<string>('GEMINI_API_KEY');
 
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-tts:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -179,25 +179,42 @@ Requirements:
   ): Promise<JudgmentResult> {
     const model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
-    const prompt = `당신은 음성 연기 대회의 심사위원입니다.
+    const prompt = `당신은 음성 연기 대회의 전문 심사위원입니다.
 두 참가자가 같은 문장을 읽었습니다.
 
 문장: "${sentence}"
 
-다음 기준으로 두 음성을 평가해주세요:
-1. 감정이입 (얼마나 감정을 잘 담았는가)
-2. 표현력 (억양, 강약, 리듬감)
-3. 발음 정확도
-4. 몰입감 (듣는 사람을 끌어들이는 힘)
+다음 4가지 기준으로 각 참가자를 0~100점으로 평가해주세요:
+1. 어조/분위기 (Tone): 문장의 분위기와 어조를 얼마나 잘 표현했는가 (가중치 40%)
+2. 감정이입 (Emotion): 감정을 얼마나 진실되게 담았는가 (가중치 30%)
+3. 리듬/표현력 (Rhythm): 억양, 강약, 리듬감이 얼마나 좋은가 (가중치 20%)
+4. 발음 (Pronunciation): 발음이 얼마나 정확한가 (가중치 10%)
+
+총점 계산: (tone * 0.4) + (emotion * 0.3) + (rhythm * 0.2) + (pronunciation * 0.1)
+
+**중요: 동점 방지 규칙**
+- 두 플레이어의 총점이 소수점까지 같을 수 없습니다. 미세하게라도 차이를 두세요.
+- 만약 총점이 매우 비슷하다면 다음 순서로 승자를 결정하세요:
+  1. 감정이입(Emotion) 점수가 더 높은 쪽 승리
+  2. 감정도 같다면 리듬(Rhythm) 점수가 더 높은 쪽 승리
+  3. 모든 점수가 같다면 소수점 단위에서 차이를 만들어 승자를 정하세요.
 
 반드시 아래 JSON 형식으로만 응답하세요:
 {
-  "player1_score": 0~100 사이 점수,
-  "player2_score": 0~100 사이 점수,
+  "player1_tone": 0~100 사이 숫자,
+  "player1_emotion": 0~100 사이 숫자,
+  "player1_rhythm": 0~100 사이 숫자,
+  "player1_pronunciation": 0~100 사이 숫자,
+  "player1_total": 계산된 총점,
+  "player2_tone": 0~100 사이 숫자,
+  "player2_emotion": 0~100 사이 숫자,
+  "player2_rhythm": 0~100 사이 숫자,
+  "player2_pronunciation": 0~100 사이 숫자,
+  "player2_total": 계산된 총점,
   "winner": 1 또는 2,
-  "reason": "판정 이유를 한국어로 2-3문장으로 설명",
-  "player1_feedback": "플레이어 1에 대한 한줄 피드백",
-  "player2_feedback": "플레이어 2에 대한 한줄 피드백"
+  "reason": "판정 이유 (한국어 2-3문장)",
+  "player1_feedback": "플레이어 1 피드백",
+  "player2_feedback": "플레이어 2 피드백"
 }`;
 
     const audio1Data = {
@@ -218,16 +235,61 @@ Requirements:
 
     try {
       const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-      return JSON.parse(jsonMatch[0]);
+      const parsed = JSON.parse(jsonMatch[0]);
+      
+      // Recalculate totals with precision
+      parsed.player1_total = Number(((parsed.player1_tone * 0.4) + (parsed.player1_emotion * 0.3) + (parsed.player1_rhythm * 0.2) + (parsed.player1_pronunciation * 0.1)).toFixed(2));
+      parsed.player2_total = Number(((parsed.player2_tone * 0.4) + (parsed.player2_emotion * 0.3) + (parsed.player2_rhythm * 0.2) + (parsed.player2_pronunciation * 0.1)).toFixed(2));
+      
+      // Enforce Tie-breaking logic
+      if (parsed.player1_total > parsed.player2_total) {
+        parsed.winner = 1;
+      } else if (parsed.player2_total > parsed.player1_total) {
+        parsed.winner = 2;
+      } else {
+        // Tie in total score, check Emotion
+        if (parsed.player1_emotion > parsed.player2_emotion) {
+          parsed.winner = 1;
+        } else if (parsed.player2_emotion > parsed.player1_emotion) {
+          parsed.winner = 2;
+        } else {
+          // Tie in Emotion, check Rhythm
+          if (parsed.player1_rhythm > parsed.player2_rhythm) {
+            parsed.winner = 1;
+          } else if (parsed.player2_rhythm > parsed.player1_rhythm) {
+            parsed.winner = 2;
+          } else {
+            // Absolute tie, default to 1 (should be rare)
+            parsed.winner = 1;
+          }
+        }
+      }
+      
+      // Legacy compatibility
+      parsed.player1_score = Math.round(parsed.player1_total);
+      parsed.player2_score = Math.round(parsed.player2_total);
+      
+      return parsed;
     } catch {
-      return {
+      const fallback = {
+        player1_tone: 50,
+        player1_emotion: 50,
+        player1_rhythm: 50,
+        player1_pronunciation: 50,
+        player1_total: 50,
+        player2_tone: 50,
+        player2_emotion: 50,
+        player2_rhythm: 50,
+        player2_pronunciation: 50,
+        player2_total: 50,
         player1_score: 50,
         player2_score: 50,
         winner: 1,
-        reason: responseText,
-        player1_feedback: '',
-        player2_feedback: '',
+        reason: "판정 중 오류가 발생했습니다.",
+        player1_feedback: "다시 시도해주세요.",
+        player2_feedback: "다시 시도해주세요.",
       };
+      return fallback;
     }
   }
 }

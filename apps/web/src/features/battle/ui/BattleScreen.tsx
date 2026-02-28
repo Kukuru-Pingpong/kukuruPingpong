@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { type Character, calculateDamage } from '@/entities/character';
 import { BattleHud } from '@/widgets/battle-hud';
-import { CharacterAvatar } from '@/widgets/character-avatar';
 import { playBlob } from '@/shared/audio';
 import type { Judgment } from '@/shared/api';
 
@@ -20,6 +19,7 @@ interface BattleScreenProps {
   playerNum?: number;
   recordings?: { 1: Blob | null; 2: Blob | null };
   sentence?: string;
+  nickname: string;
 }
 
 type Phase = 'enter' | 'scores' | 'charge' | 'projectile' | 'hit' | 'hp' | 'done';
@@ -37,6 +37,7 @@ export default function BattleScreen({
   playerNum,
   recordings,
   sentence,
+  nickname,
 }: BattleScreenProps) {
   const [phase, setPhase] = useState<Phase>('enter');
   const [displayP1Score, setDisplayP1Score] = useState(0);
@@ -46,21 +47,14 @@ export default function BattleScreen({
   const [displayP1Hp, setDisplayP1Hp] = useState(p1Hp);
   const [displayP2Hp, setDisplayP2Hp] = useState(p2Hp);
   const [judging, setJudging] = useState(false);
-  const phaseTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const phaseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Audio auto-play state
-  const [nowPlaying, setNowPlaying] = useState<0 | 1 | 2>(0); // 0=none, 1=p1, 2=p2
+  const [nowPlaying, setNowPlaying] = useState<0 | 1 | 2>(0);
   const [autoPlayDone, setAutoPlayDone] = useState(false);
   const audio1Ref = useRef<HTMLAudioElement>(null);
   const audio2Ref = useRef<HTMLAudioElement>(null);
-  const judgmentRef = useRef(judgment);
 
-  // Keep ref in sync
-  useEffect(() => {
-    judgmentRef.current = judgment;
-  }, [judgment]);
-
-  // 1) 배틀 화면 진입 시 판정 요청 (로컬: 무조건 / 온라인: P1만)
   useEffect(() => {
     if (!judgment && onJudge && !judging) {
       if (mode === 'local' || (mode === 'online' && playerNum === 1)) {
@@ -70,12 +64,11 @@ export default function BattleScreen({
     }
   }, [judgment, onJudge, mode, playerNum, judging]);
 
-  // 2) 녹음 자동 동시 재생: P1 + P2 함께
   const autoPlay = useCallback(async () => {
     if (!recordings?.[1] || !recordings?.[2]) return;
     if (!audio1Ref.current || !audio2Ref.current) return;
 
-    setNowPlaying(1); // 1 = 재생 중 표시용 (둘 다 재생)
+    setNowPlaying(1);
     try {
       await Promise.all([
         playBlob(recordings[1], audio1Ref.current),
@@ -93,7 +86,6 @@ export default function BattleScreen({
     }
   }, [recordings, judgment, autoPlayDone, autoPlay]);
 
-  // 3) 판정 도착 시 재생 중이면 정지
   useEffect(() => {
     if (judgment) {
       if (audio1Ref.current) {
@@ -108,15 +100,17 @@ export default function BattleScreen({
     }
   }, [judgment]);
 
-  // 4) 판정 결과 → 배틀 애니메이션
   useEffect(() => {
     if (!judgment) return;
 
     const w = judgment.winner as 1 | 2;
     const loser = w === 1 ? 2 : 1;
+    const s1 = judgment.player1_total ?? judgment.player1_score ?? 0;
+    const s2 = judgment.player2_total ?? judgment.player2_score ?? 0;
+    
     const dmg = calculateDamage(
-      w === 1 ? judgment.player1_score : judgment.player2_score,
-      loser === 1 ? judgment.player1_score : judgment.player2_score,
+      w === 1 ? s1 : s2,
+      loser === 1 ? s1 : s2,
     );
 
     setWinner(w);
@@ -125,7 +119,7 @@ export default function BattleScreen({
 
     phaseTimerRef.current = setTimeout(() => {
       setPhase('scores');
-      animateScores(judgment.player1_score, judgment.player2_score);
+      animateScores(s1, s2);
 
       phaseTimerRef.current = setTimeout(() => {
         setPhase('charge');
@@ -183,163 +177,186 @@ export default function BattleScreen({
     }, 1000 / fps);
   };
 
-  const c1 = p1Character;
-  const c2 = p2Character;
   const loser = winner === 1 ? 2 : 1;
 
-  // ===== 판정 대기 화면: 음성 자동 재생 =====
   if (!judgment) {
     return (
-      <div className="screen">
-        <div className="container" style={{ textAlign: 'center' }}>
+      <div className="lobby-container">
+        <header className="retro-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '1.2rem' }}>🎮</span>
+            <span style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>KUKURU PINGPONG</span>
+          </div>
+          <div className="retro-badge">{nickname || 'PLAYER'}</div>
+        </header>
+
+        <main className="screen" style={{ paddingTop: '100px', flexDirection: 'column', gap: '24px' }}>
           {sentence && (
-            <div className="sentence-box small" style={{ marginBottom: 20 }}>
-              {sentence}
+            <div className="retro-frame-dark" style={{ width: '100%', maxWidth: '460px', textAlign: 'center' }}>
+              <p style={{ fontSize: '0.8rem', lineHeight: '1.6' }}>"{sentence}"</p>
             </div>
           )}
 
-          <div className="listen-players" style={{ marginBottom: 24 }}>
-            {/* Player 1 */}
-            <div className={`listen-card${nowPlaying ? ' listen-active' : ''}`}>
-              <div className={`listen-avatar${nowPlaying ? ' pulse' : ''}`}>
-                {c1 && (
-                  <CharacterAvatar image={c1.image} emoji={c1.emoji} size={72} className="" />
-                )}
-              </div>
-              <h3 className="player-label p1" style={{ marginTop: 8 }}>
-                {mode === 'local' ? '나' : 'Player 1'}
-              </h3>
-              {nowPlaying > 0 && (
-                <div className="listen-indicator">
-                  <span className="listen-bar" /><span className="listen-bar" /><span className="listen-bar" />
-                </div>
-              )}
+          <div style={{ display: 'flex', gap: '16px', width: '100%', maxWidth: '460px' }}>
+            <div className={`retro-frame${nowPlaying === 1 ? '-dark' : ''}`} style={{ flex: 1, textAlign: 'center' }}>
+              <span style={{ fontSize: '3rem' }}>{p1Character?.emoji}</span>
+              <div className="retro-badge" style={{ fontSize: '0.45rem', marginTop: '8px' }}>P1</div>
               <audio ref={audio1Ref} />
             </div>
-
-            <div className="vs-badge">VS</div>
-
-            {/* Player 2 */}
-            <div className={`listen-card${nowPlaying ? ' listen-active' : ''}`}>
-              <div className={`listen-avatar${nowPlaying ? ' pulse' : ''}`}>
-                {c2 && (
-                  <CharacterAvatar image={c2.image} emoji={c2.emoji} size={72} className="" />
-                )}
-              </div>
-              <h3 className="player-label p2" style={{ marginTop: 8 }}>
-                {mode === 'local' ? 'AI' : 'Player 2'}
-              </h3>
-              {nowPlaying > 0 && (
-                <div className="listen-indicator">
-                  <span className="listen-bar" /><span className="listen-bar" /><span className="listen-bar" />
-                </div>
-              )}
+            <div style={{ display: 'flex', alignItems: 'center', fontSize: '1.5rem', fontWeight: 'bold' }}>VS</div>
+            <div className={`retro-frame${nowPlaying === 1 ? '-dark' : ''}`} style={{ flex: 1, textAlign: 'center' }}>
+              <span style={{ fontSize: '3rem' }}>{p2Character?.emoji}</span>
+              <div className="retro-badge" style={{ fontSize: '0.45rem', marginTop: '8px' }}>P2</div>
               <audio ref={audio2Ref} />
             </div>
           </div>
 
-          <div className="loading-spinner" style={{ margin: '0 auto 12px' }} />
-          <p className="loading-text">
-            {nowPlaying ? '두 목소리를 듣고 있어요...' : 'AI 심판이 판정 중...'}
-          </p>
-        </div>
+          <div className="retro-badge-light" style={{ margin: '0 auto', animation: 'gb-blink 1s step-end infinite' }}>
+            AI JUDGING VOICES...
+          </div>
+        </main>
       </div>
     );
   }
 
-  // ===== 배틀 애니메이션 =====
   return (
-    <div className="screen">
-      <div className="container">
+    <div className="lobby-container">
+      <header className="retro-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '1.2rem' }}>🎮</span>
+          <span style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>KUKURU PINGPONG</span>
+        </div>
+        <div className="retro-badge">{nickname || 'PLAYER'}</div>
+      </header>
+
+      <main className="screen" style={{ paddingTop: '100px', flexDirection: 'column', gap: '20px' }}>
         <BattleHud
-          p1Character={c1}
-          p2Character={c2}
+          p1Character={p1Character}
+          p2Character={p2Character}
           p1Hp={displayP1Hp}
           p2Hp={displayP2Hp}
           round={round}
         />
 
-        <div className="battle-arena">
-          <div className="battle-characters">
-            <div className={`battle-char left${phase === 'charge' && winner === 1 ? ' charging' : ''}${phase === 'hit' && loser === 1 ? ' hit' : ''}`}>
-              <div style={{ position: 'relative' }}>
-                {c1 && (
-                  <CharacterAvatar image={c1.image} emoji={c1.emoji} size={64} className="battle-char-emoji" />
-                )}
-                {phase === 'charge' && winner === 1 && (
-                  <div className="aura" style={{ background: c1?.auraColor, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
-                )}
-              </div>
-              <span className="battle-char-name" style={{ color: 'var(--p1-color)' }}>
-                {c1?.name}
+        <div className="battle-arena" style={{ width: '100%', maxWidth: '460px', height: '300px', position: 'relative' }}>
+          {/* Battle Characters */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            width: '100%',
+            marginTop: '40px'
+          }}>
+            {/* P1 */}
+            <div style={{ 
+              textAlign: 'center',
+              transform: phase === 'charge' && winner === 1 ? 'scale(1.2)' : 'none',
+              transition: 'all 0.2s',
+              opacity: phase === 'hit' && loser === 1 ? 0.5 : 1
+            }}>
+              <span style={{ fontSize: '4rem', filter: phase === 'charge' && winner === 1 ? 'drop-shadow(0 0 10px var(--border))' : 'none' }}>
+                {p1Character?.emoji}
               </span>
               {(phase === 'hit' || phase === 'hp') && loser === 1 && (
-                <div className="damage-popup" style={{ top: '-20px' }}>-{damage}</div>
+                <div style={{ 
+                  position: 'absolute', 
+                  top: '-40px', 
+                  left: '20px', 
+                  fontSize: '1.5rem', 
+                  color: '#ff0000',
+                  fontFamily: 'var(--font-pixel)',
+                  animation: 'damageFloat 1s forwards'
+                }}>-{damage}</div>
               )}
             </div>
 
-            <span className="battle-vs">VS</span>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', opacity: 0.3 }}>VS</div>
 
-            <div className={`battle-char right${phase === 'charge' && winner === 2 ? ' charging' : ''}${phase === 'hit' && loser === 2 ? ' hit' : ''}`}>
-              <div style={{ position: 'relative' }}>
-                {c2 && (
-                  <CharacterAvatar image={c2.image} emoji={c2.emoji} size={64} className="battle-char-emoji" />
-                )}
-                {phase === 'charge' && winner === 2 && (
-                  <div className="aura" style={{ background: c2?.auraColor, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
-                )}
-              </div>
-              <span className="battle-char-name" style={{ color: 'var(--p2-color)' }}>
-                {c2?.name}
+            {/* P2 */}
+            <div style={{ 
+              textAlign: 'center',
+              transform: phase === 'charge' && winner === 2 ? 'scale(1.2)' : 'none',
+              transition: 'all 0.2s',
+              opacity: phase === 'hit' && loser === 2 ? 0.5 : 1
+            }}>
+              <span style={{ fontSize: '4rem', filter: phase === 'charge' && winner === 2 ? 'drop-shadow(0 0 10px var(--border))' : 'none' }}>
+                {p2Character?.emoji}
               </span>
               {(phase === 'hit' || phase === 'hp') && loser === 2 && (
-                <div className="damage-popup" style={{ top: '-20px' }}>-{damage}</div>
+                <div style={{ 
+                  position: 'absolute', 
+                  top: '-40px', 
+                  right: '20px', 
+                  fontSize: '1.5rem', 
+                  color: '#ff0000',
+                  fontFamily: 'var(--font-pixel)',
+                  animation: 'damageFloat 1s forwards'
+                }}>-{damage}</div>
               )}
             </div>
           </div>
 
+          {/* Projectile */}
           {phase === 'projectile' && winner && (
-            <div
-              className={`projectile ${winner === 1 ? 'to-right' : 'to-left'}`}
-              style={{ top: '40%' }}
-            >
-              {(winner === 1 ? c1 : c2) && (
-                <CharacterAvatar
-                  image={(winner === 1 ? c1! : c2!).image}
-                  emoji={(winner === 1 ? c1! : c2!).emoji}
-                  size={40}
-                  className=""
-                />
-              )}
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: winner === 1 ? '20%' : '80%',
+              fontSize: '2rem',
+              animation: winner === 1 ? 'projectileFlyRight 0.5s forwards' : 'projectileFlyLeft 0.5s forwards'
+            }}>
+              ✨
             </div>
           )}
 
+          {/* Scores */}
           {phase !== 'enter' && (
-            <div className="battle-scores">
-              <div className="battle-score">
-                <span className="battle-score-label">P1</span>
-                <div className="battle-score-number p1">{displayP1Score}</div>
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-around', 
+              width: '100%', 
+              marginTop: '40px',
+              fontFamily: 'var(--font-pixel)'
+            }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '0.5rem', marginBottom: '4px' }}>P1 SCORE</div>
+                <div style={{ fontSize: '1.5rem' }}>{displayP1Score}</div>
               </div>
-              <div className="battle-score">
-                <span className="battle-score-label">P2</span>
-                <div className="battle-score-number p2">{displayP2Score}</div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '0.5rem', marginBottom: '4px' }}>P2 SCORE</div>
+                <div style={{ fontSize: '1.5rem' }}>{displayP2Score}</div>
               </div>
             </div>
           )}
 
+          {/* Attack Line */}
           {phase === 'charge' && winner && (
-            <div className="attack-line">
-              &quot;{winner === 1 ? c1?.attackLine : c2?.attackLine}&quot;
+            <div className="retro-frame" style={{ 
+              position: 'absolute', 
+              bottom: '0', 
+              left: '50%', 
+              transform: 'translateX(-50%)',
+              width: '100%',
+              fontSize: '0.6rem',
+              textAlign: 'center'
+            }}>
+              &quot;{winner === 1 ? p1Character?.attackLine : p2Character?.attackLine}&quot;
             </div>
           )}
 
           {phase === 'done' && (
-            <p className="desc" style={{ animation: 'fadeIn 0.3s ease' }}>
-              {winner === 1 ? 'Player 1' : 'Player 2'} 라운드 승리! 다음 라운드 준비 중...
-            </p>
+            <div className="retro-badge-light" style={{ 
+              position: 'absolute', 
+              bottom: '0', 
+              left: '50%', 
+              transform: 'translateX(-50%)',
+              padding: '8px 16px'
+            }}>
+              ROUND COMPLETE!
+            </div>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }

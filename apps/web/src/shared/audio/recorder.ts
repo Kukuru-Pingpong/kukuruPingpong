@@ -12,10 +12,10 @@ function getSupportedMimeType(): string {
 }
 
 function formatTime(ms: number): string {
-  const sec = Math.floor(ms / 1000);
-  const min = Math.floor(sec / 60);
-  const remSec = sec % 60;
-  return `${min}:${remSec.toString().padStart(2, '0')}`;
+  const totalSec = Math.floor(ms / 1000);
+  const min = Math.floor(totalSec / 60);
+  const remSec = totalSec % 60;
+  return `${min.toString().padStart(2, '0')}:${remSec.toString().padStart(2, '0')}`;
 }
 
 export async function initAudio(): Promise<MediaStream> {

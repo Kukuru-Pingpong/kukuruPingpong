@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { type Character } from '@/entities/character';
-import { CharacterAvatar } from '@/widgets/character-avatar';
 
 interface KoScreenProps {
   p1Character: Character | null;
@@ -49,57 +48,69 @@ export default function KoScreen({
   }, []);
 
   return (
-    <div className="ko-overlay">
-      {phase === 'flash' && <div className="ko-flash" />}
-
-      {(phase === 'ko-text' || phase === 'characters' || phase === 'info') && (
-        <div className={`ko-text${shaking ? ' ko-shake' : ''}`}>
-          KO!
-        </div>
+    <div className="lobby-container" style={{ background: 'var(--bg-card)', color: 'var(--text-light)', height: '100vh', position: 'fixed', inset: 0, zIndex: 2000 }}>
+      {phase === 'flash' && (
+        <div style={{ position: 'fixed', inset: 0, background: '#fff', zIndex: 2001, animation: 'koFlash 0.9s forwards' }} />
       )}
 
-      {(phase === 'characters' || phase === 'info') && (
-        <div className="ko-characters">
-          <div className={`ko-char ${winner === 1 ? 'winner' : 'loser'}`}>
-            <span className="ko-char-emoji">
-              {p1Character && (
-                <CharacterAvatar image={p1Character.image} emoji={p1Character.emoji} size={64} className="" />
-              )}
-            </span>
-            <span className="ko-char-name" style={{ color: 'var(--p1-color)' }}>
-              {p1Character?.name}
-            </span>
-            <span className={`ko-char-label ${winner === 1 ? 'win' : 'lose'}`}>
-              {winner === 1 ? 'WIN!' : 'LOSE'}
-            </span>
+      <main className="screen" style={{ flexDirection: 'column', gap: '40px', justifyContent: 'center' }}>
+        {(phase === 'ko-text' || phase === 'characters' || phase === 'info') && (
+          <h1 className={shaking ? 'ko-shake' : ''} style={{ 
+            fontSize: '5rem', 
+            color: '#ff0000', 
+            textAlign: 'center',
+            letterSpacing: '8px',
+            fontFamily: 'var(--font-pixel)',
+            animation: 'koScaleUp 0.5s forwards'
+          }}>
+            K.O.
+          </h1>
+        )}
+
+        {(phase === 'characters' || phase === 'info') && (
+          <div style={{ display: 'flex', gap: '32px', justifyContent: 'center', width: '100%' }}>
+            <div style={{ 
+              textAlign: 'center', 
+              opacity: winner === 1 ? 1 : 0.3, 
+              transform: winner === 1 ? 'scale(1.2)' : 'scale(0.8) rotate(15deg)',
+              transition: 'all 0.5s'
+            }}>
+              <div className="retro-frame" style={{ padding: '8px', background: winner === 1 ? 'var(--bg-surface)' : 'var(--bg-card)' }}>
+                <span style={{ fontSize: '4rem' }}>{p1Character?.emoji}</span>
+              </div>
+              <div className="retro-badge" style={{ marginTop: '12px' }}>{winner === 1 ? 'WINNER' : 'LOSER'}</div>
+            </div>
+
+            <div style={{ 
+              textAlign: 'center', 
+              opacity: winner === 2 ? 1 : 0.3, 
+              transform: winner === 2 ? 'scale(1.2)' : 'scale(0.8) rotate(-15deg)',
+              transition: 'all 0.5s'
+            }}>
+              <div className="retro-frame" style={{ padding: '8px', background: winner === 2 ? 'var(--bg-surface)' : 'var(--bg-card)' }}>
+                <span style={{ fontSize: '4rem' }}>{p2Character?.emoji}</span>
+              </div>
+              <div className="retro-badge" style={{ marginTop: '12px' }}>{winner === 2 ? 'WINNER' : 'LOSER'}</div>
+            </div>
           </div>
+        )}
 
-          <div className={`ko-char ${winner === 2 ? 'winner' : 'loser'}`}>
-            <span className="ko-char-emoji">
-              {p2Character && (
-                <CharacterAvatar image={p2Character.image} emoji={p2Character.emoji} size={64} className="" />
-              )}
-            </span>
-            <span className="ko-char-name" style={{ color: 'var(--p2-color)' }}>
-              {p2Character?.name}
-            </span>
-            <span className={`ko-char-label ${winner === 2 ? 'win' : 'lose'}`}>
-              {winner === 2 ? 'WIN!' : 'LOSE'}
-            </span>
+        {phase === 'info' && (
+          <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div className="retro-badge-light" style={{ padding: '8px 16px', margin: '0 auto' }}>
+              FINISHED IN {round} ROUNDS
+            </div>
+            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+              <button className="retro-button-light" onClick={onRematch}>
+                {'> REMATCH'}
+              </button>
+              <button className="retro-button" onClick={() => window.location.href = '/'}>
+                {'> EXIT'}
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-
-      {phase === 'info' && (
-        <div className="ko-info">
-          <p className="ko-round-text">
-            <strong>{round}라운드</strong> 만에 결판!
-          </p>
-          <button className="btn btn-primary btn-large" onClick={onRematch}>
-            다시 도전하기
-          </button>
-        </div>
-      )}
+        )}
+      </main>
     </div>
   );
 }
