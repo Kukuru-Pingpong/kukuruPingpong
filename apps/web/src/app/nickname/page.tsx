@@ -1,10 +1,11 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { NicknamePopup } from '@/features/title';
 import { useGame } from '@/contexts/GameContext';
 
-export default function NicknamePage() {
+function NicknameContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { nickname, nicknameLoaded, setNickname } = useGame();
@@ -28,5 +29,13 @@ export default function NicknamePage() {
         }}
       />
     </div>
+  );
+}
+
+export default function NicknamePage() {
+  return (
+    <Suspense>
+      <NicknameContent />
+    </Suspense>
   );
 }
