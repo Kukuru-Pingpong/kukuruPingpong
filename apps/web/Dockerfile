@@ -10,6 +10,7 @@ COPY apps/web/package.json apps/web/
 RUN pnpm install --frozen-lockfile --filter web
 COPY apps/web apps/web
 RUN pnpm --filter web build
+RUN ls -la /app/apps/web/.next/ && ls -la /app/apps/web/.next/standalone/ || echo "standalone NOT found"
 
 FROM base AS runner
 WORKDIR /app
