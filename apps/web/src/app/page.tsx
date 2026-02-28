@@ -7,7 +7,7 @@ import { useGame } from '@/contexts/GameContext';
 
 export default function HomePage() {
   const router = useRouter();
-  const { handleLocal, handleOnline, nickname, nicknameLoaded } = useGame();
+  const { handleLocal, handleOnline, nickname, nicknameLoaded, setNickname } = useGame();
 
   if (!nicknameLoaded) return null;
 
@@ -17,7 +17,15 @@ export default function HomePage() {
 
   return (
     <div className="app">
-      <LobbyScreen onLocal={handleLocal} onOnline={handleOnline} nickname={nickname} />
+      <LobbyScreen
+        onLocal={handleLocal}
+        onOnline={handleOnline}
+        nickname={nickname}
+        onReset={() => {
+          localStorage.removeItem('kukuru_nickname');
+          setNickname('');
+        }}
+      />
     </div>
   );
 }
