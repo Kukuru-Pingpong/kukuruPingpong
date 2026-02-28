@@ -1,8 +1,14 @@
-export default function Home() {
+'use client';
+
+import { LobbyScreen } from '@/features/lobby';
+import { useGame } from '@/contexts/GameContext';
+
+export default function LobbyPage() {
+  const { handleLocal, handleOnline } = useGame();
+
   return (
-    <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>Kukurupingpong</h1>
-      <p>Welcome to the monorepo!</p>
-    </main>
+    <div className="app">
+      <LobbyScreen onLocal={handleLocal} onOnline={handleOnline} />
+    </div>
   );
 }
