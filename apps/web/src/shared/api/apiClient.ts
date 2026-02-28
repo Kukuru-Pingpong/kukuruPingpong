@@ -1,6 +1,6 @@
 import type { Judgment } from './types';
 
-const API_BASE = '/api';
+const API_BASE = `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000'}/api`;
 
 export async function generateSentence(
   word: string,
