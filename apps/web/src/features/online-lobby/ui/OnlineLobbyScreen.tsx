@@ -60,12 +60,12 @@ export default function OnlineLobbyScreen({
         <div className="retro-badge">{nickname || 'PLAYER'}</div>
       </header>
 
-      <main className="screen" style={{ paddingTop: '80px', flexDirection: 'column', gap: '24px' }}>
+      <main className="screen" style={{ paddingTop: '80px', flexDirection: 'column', gap: '24px', alignItems: 'center' }}>
         <div className="retro-badge-light" style={{ margin: '0 auto' }}>
           MULTIPLAYER LOBBY
         </div>
 
-        <h1 style={{ fontSize: '1.5rem', textAlign: 'center', marginBottom: '8px' }}>CHOOSE YOUR PATH</h1>
+        <h1 style={{ fontSize: '1.5rem', textAlign: 'center', marginBottom: '8px', width: '100%' }}>CHOOSE YOUR PATH</h1>
 
         <div className="retro-badge" style={{ margin: '0 auto', fontSize: '0.6rem' }}>
           {'> HOST A BATTLE OR JOIN THE FRAY <'}
@@ -74,7 +74,6 @@ export default function OnlineLobbyScreen({
         <div style={{ display: 'flex', gap: '16px', width: '100%', maxWidth: '460px', margin: '0 auto' }}>
           {/* CREATE ROOM Card */}
           <div className="retro-frame" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', minHeight: '180px' }}>
-            <div style={{ fontSize: '2rem', textAlign: 'center' }}>👑</div>
             <h2 style={{ fontSize: '0.8rem', textAlign: 'center' }}>CREATE ROOM</h2>
             {!waiting ? (
               <>
@@ -107,7 +106,6 @@ export default function OnlineLobbyScreen({
 
           {/* JOIN ROOM Card */}
           <div className="retro-frame" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', minHeight: '180px' }}>
-            <div style={{ fontSize: '2rem', textAlign: 'center' }}>🔑</div>
             <h2 style={{ fontSize: '0.8rem', textAlign: 'center' }}>JOIN ROOM</h2>
             <div className="retro-badge" style={{ fontSize: '0.45rem', alignSelf: 'center' }}>ENTER CODE</div>
             <input 

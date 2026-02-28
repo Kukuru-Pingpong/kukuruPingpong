@@ -15,6 +15,7 @@ import { RoomService } from '../../application/services/room.service';
     origin: [
       'http://localhost:3000',
       'http://localhost:3001',
+      'https://kukurupingpong-web-631387150302.asia-northeast3.run.app',
       process.env.FRONTEND_URL,
     ].filter(Boolean),
     credentials: true,
