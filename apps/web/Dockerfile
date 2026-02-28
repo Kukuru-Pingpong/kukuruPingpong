@@ -7,6 +7,7 @@ FROM base AS build
 WORKDIR /app
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/web/package.json apps/web/
+RUN echo "node-linker=hoisted" > .npmrc
 RUN pnpm install --frozen-lockfile --filter web
 COPY apps/web apps/web
 RUN pnpm --filter web build
