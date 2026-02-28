@@ -24,6 +24,7 @@ function NicknameContent() {
       <NicknamePopup
         characterImage={`/characters/${charId}.png`}
         onComplete={(name) => {
+          localStorage.setItem('kukuru_char', charId);
           setNickname(name);
           router.replace('/');
         }}
