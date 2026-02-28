@@ -44,6 +44,7 @@ interface GameContextType {
   isKo: boolean;
   koLoser: 1 | 2 | null;
   nickname: string;
+  nicknameLoaded: boolean;
 
   setMode: (mode: 'local' | 'online') => void;
   setSentence: (s: string) => void;
@@ -82,9 +83,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   const [mode, setMode] = useState<'local' | 'online'>('local');
-  const [nickname, setNickname] = useState(() =>
-    typeof window !== 'undefined' ? localStorage.getItem('kukuru_nickname') || '' : ''
-  );
+  const [nickname, setNickname] = useState('');
+  const [nicknameLoaded, setNicknameLoaded] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('kukuru_nickname') || '';
+    if (saved) setNickname(saved);
+    setNicknameLoaded(true);
+  }, []);
   const [loading, setLoading] = useState('');
   const [sentence, setSentence] = useState('');
   const [quoteSource, setQuoteSource] = useState('');
@@ -463,6 +469,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     isKo,
     koLoser,
     nickname,
+    nicknameLoaded,
 
     setMode,
     setSentence,
