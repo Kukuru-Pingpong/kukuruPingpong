@@ -6,7 +6,7 @@ https://github.com/Kukuru-Pingpong
 
 프로젝트 설명
 
-"쿠쿠루삥뽕(Kukuru-Pingpong)"은 한국의 대중적인 밈이자 영화 명대사를 활용한 실시간 턴제 음성 배틀 게임입니다. 짧고 강렬한 세션(1~3분) 동안 유저들은 유명 영화의 명대사를 직접 연기하며 대결을 펼치며, Google Gemini 3 API가 음성 심판이 되어 영화의 원본 대사와 유저의 목소리를 비교하여 승패를 결정합니다.
+쿠쿠루삥뽕은 한국의 대중적인 밈이자 영화 명대사를 활용한 실시간 턴제 음성 배틀 게임입니다. 짧고 강렬한 세션(1~3분) 동안 유저들은 유명 영화의 명대사를 직접 연기하며 대결을 펼치며, Google Gemini 3 API가 음성 심판이 되어 영화의 원본 대사와 유저의 목소리를 비교하여 승패를 결정합니다.
 
 단순히 목소리를 녹음하는 것을 넘어, Gemini를 활용한 4중 AI 파이프라인을 게임 루프의 핵심에 배치하여 몰입감 높은 엔터테인먼트 경험을 창조했습니다.
 
@@ -27,9 +27,6 @@ https://github.com/Kukuru-Pingpong
 - Frontend: Next.js 15, React 19, Socket.io-client (웹 마이크 녹음 및 실시간 소켓 통신)
 - Backend: NestJS, Socket.io (실시간 룸 매칭 및 턴제 상태 동기화)
 - AI / Cloud: Google Gemini API (Text, Audio Analysis, Image, TTS), Google Cloud Platform
-
-기술데모 (1분 분량 영상)
-*(영상 링크 또는 첨부 내용을 이곳에 기입해주세요)*
 
 ---
 
@@ -64,4 +61,4 @@ Tech Stack
 - AI / Cloud: Google Gemini API (Text, Audio Analysis, Image, TTS), Google Cloud Platform
 
 Technical Demo (1-minute video)
-*(Please insert video link or attachment here)*
+[Demonstration Video (Attached)](../asset/video/kkrp_demo.mp4)
